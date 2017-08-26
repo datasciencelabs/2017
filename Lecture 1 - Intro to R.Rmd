@@ -12,7 +12,7 @@ output:
 
 We will be using the
 [R programming language](https://cran.r-project.org/) for all our
-analysis. You will learn R and statistics simultaneously. We will by installing R and RStudio, then covering some basics.
+analysis. You will learn R and statistics simultaneously. We will be installing R and RStudio, then covering some basics.
 
 Although R is technically a programming language, it was developed specifically for analyzing data. We will therefore teach R in the context of analyzing data rather than as one would teach a programming language. As a result, we will be learning some data analysis concepts along the way. For those with limited programming experinece we highly recommend you complete one of the following R programming courses:
 
@@ -45,9 +45,9 @@ Windows we have special
 
 Now that you have download and installed R you are ready to start working with data. Whichever approach you are using to interact with R, we recommend RStudio, you should identify the console. 
 
-<!-- ![the console](console_screen_shot.png) -->
+![the console](console_screen_shot.png)
 
-When you type a line of code into the consult and hit enter the command gets _executed_. For example, try typine
+When you type a line of code into the console and hit enter, the command gets _executed_. For example, try typing
 
 ```{r}
 2+3
@@ -76,7 +76,7 @@ data
 ```
 
 
-To see na example of functions at work, we will use to `co2` dataset to illustrate the function `plot`, one of the base functions. We can plot Mauna Loa Atmospheric CO2 Concentration versus data like this:
+To see an example of functions at work, we will use the `co2` dataset to illustrate the function `plot`, one of the base functions. We can plot Mauna Loa Atmospheric CO2 Concentration versus time like this:
 
 ```{r}
 plot(co2)
