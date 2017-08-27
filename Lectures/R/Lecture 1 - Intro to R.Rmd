@@ -6,9 +6,13 @@ output:
 ---
 
 
-# R for Data Science
+# R for Data Science -->
 
+<<<<<<< HEAD
 ## Introduction
+=======
+## Introduction  -->
+>>>>>>> d84dcc91dd3402c2104e456394fe6ccec4affc19
 
 We will be using the
 [R programming language](https://cran.r-project.org/) for all our
