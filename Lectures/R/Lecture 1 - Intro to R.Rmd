@@ -6,9 +6,9 @@ output:
 ---
 
 
-# R for Data Science
+# R for Data Science -->
 
-## Introduction 
+## Introduction  -->
 
 We will be using the
 [R programming language](https://cran.r-project.org/) for all our
@@ -45,7 +45,7 @@ Windows we have special
 
 Now that you have download and installed R you are ready to start working with data. Whichever approach you are using to interact with R, we recommend RStudio, you should identify the console. 
 
-![the console](console_screen_shot.png)
+![The console](console_screen_shot.png)
 
 When you type a line of code into the console and hit enter, the command gets _executed_. For example, try typing
 
@@ -150,7 +150,9 @@ Value/CSV) or tab delimited (Tab-Separated Value/TSV/TXT) files.
 These plain-text formats are often easier for sharing, as commercial software is not required for viewing or
 working with the data.
 
-We will start with a simple example dataset containing the [heights of students in our class](https://raw.githubusercontent.com/datasciencelabs/data/master/bio260-heights.csv)
+<!-- We will start with a simple example dataset containing the [heights of students in our class](https://raw.githubusercontent.com/datasciencelabs/data/master/bio260-heights.csv) -->
+
+We will start with a simple example dataset containing the _heights of students in our class_.
 
 The first step is to find the file containing your data and know its *path*. 
 
@@ -165,7 +167,9 @@ getwd()
 
 You can also change your working directory using the function `setwd`. Or you can change it through RStudio by clicking on "Session". 
 
-The functions that read and write files (there are several in R) assume you mean to look for files or write files in the working directory. Our recommended approach for beginners will have you reading and writing to the working directory. However, you can also type the [full path](http://www.computerhope.com/jargon/a/absopath.htm), which will work independently of the working directory.
+<!-- The functions that read and write files (there are several in R) assume you mean to look for files or write files in the working directory. Our recommended approach for beginners will have you reading and writing to the working directory. However, you can also type the [full path](http://www.computerhope.com/jargon/a/absopath.htm), which will work independently of the working directory. -->
+
+The functions that read and write files (there are several in R) assume you mean to look for files or write files in the working directory. Our recommended approach for beginners will have you reading and writing to the working directory. However, you can also type the full path, which will work independently of the working directory.
 
 #### Projects in RStudio
 
