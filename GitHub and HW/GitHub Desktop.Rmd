@@ -40,8 +40,6 @@ example `<your_GitHub_username>-2017HW1` for Homework 1.
 
 5. Save the repository in your BST 260 folder.
 
- <center><img src="./images/choose_repo.png" alt="gitclean" style="width: 700px;"/></center>
-
 
 ### Working on your homework
 
@@ -49,13 +47,7 @@ Once you have a local copy of your repository, it's time to get to work!
 
 After writing some of your homework in an `Rmd` file, and `knit` it, 
 make pretty plots, find out some cool stuff about the dataset it's 
-time to `commit/push`. After some work, if you head back to `GitHub Desktop`, 
-you will see that something has changed:
-
- <center><img src="./images/commit.png" alt="gitclean" style="width: 700px;"/></center>
-
-You will notice that the homework file is selected and that the changes you made are shown.  (Again, this is from last year's course. You would see files relating to HW1 and 2017).
-In order to get git to save these changes on these files we need to 
+time to `commit/push`. After some work, if you head back to `GitHub Desktop`, you will notice that the homework file is selected and that the changes you made are shown. In order to get git to save these changes on these files we need to 
 `commit` them. This is equivalent to `save` in most programs. But what is special 
 about `git` and other version control software is that we can track 
 and revert changes! We also need to give what's called a `commit message`, 
@@ -64,7 +56,6 @@ this in the future. Leave detailed messages so that future you will
 know what you did. Future you will thank you. We will get to this 
 part later. 
 
-<center><img src="./images/commit.png" alt="gitclean" style="width: 700px;"/></center>
 
 Cool! Now we've saved our work on our local directory, we can now `push` 
 our work to Github by clicking the 'push to origin' button at the top. Note, we can (and should) do this as many times as 
@@ -73,7 +64,6 @@ it will make getting help from your TA easier as well as keeping a
 copy of your work in the cloud in case your computer crashes, or you 
 accidentally delete something.	
 
-<center><img src="./images/push.png" alt="gitclean" style="width: 700px;"/></center>
 
 ### Summary
 To summarize, it is important to do the following 
