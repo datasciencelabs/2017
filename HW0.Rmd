@@ -1,0 +1,25 @@
+---
+title: "Homework 0"
+date: "September 1, 2017"
+output: html_document
+---
+
+**This is a demo homework to give you practice with submitting homework. It will _not_ be graded. The due date and time for submission will be posted here. When complete, submit your code in the R Markdown file and the knitted HTML file on GitHub.**
+
+# Problem 1
+
+The first step in our analysis is to read in and organize the data. We will be using the BST 260 heights data from the 2016 survey. Read through [this](https://github.com/datasciencelabs/2017/blob/master/Lectures/Lecture%202/data-import.Rmd) file on the course website for how to import the data. Write your code for importing the data below.
+
+```{r}
+# Put your code here
+```
+
+# Problem 2
+
+Now that your data is loaded, print the first few lines of the dataframe. What do you notice? Hint: type ?head if need help printing the first few lines of the file.
+
+```{r}
+# Put your code here
+```
+
+
