@@ -37,7 +37,7 @@ example `<your_GitHub_username>-2017HW1` for Homework 1.
 
 5. Click "Create Project". You should now see the files in the repository in the lower right window in RStudio. Also notice the Git tab in the upper right window.
 
- <center><img src="./images/rstudio_file_open.png" alt="gitclean" style="width: 700px;"/></center>
+ <center><img src="./images/rstudio_screen.png" alt="gitclean" style="width: 700px;"/></center>
 
 
 ### Working on your homework
