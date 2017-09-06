@@ -3,10 +3,10 @@ title: Homework with Git and GitHub inside RStudio
 output: html_document
 ---
 
-Starting with homework 1, we will be using 
-git and GitHub to get your homework assignment, work on your homework, 
+We will be using 
+git and GitHub to get your homework assignments, work on your homework, 
 and submit your homework solutions. This tutorial will walk you through 
-that process using git and GitHub through RStudio. 
+that process using git and GitHub through RStudio (see the other [tutorial](https://github.com/datasciencelabs/2017/blob/master/lectures/git-and-github/git-command-line.Rmd) for using git and GitHub through the command line).
 
 ## Getting and Working on Homework
 
