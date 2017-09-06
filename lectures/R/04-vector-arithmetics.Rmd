@@ -1,12 +1,12 @@
 ## Vector arithmetics
 
-California had the most murders. But does this mean it is the most dangerous state. What if it just has many more people than any other state. We can very quickly confirm that, indeed, California has the largest population:
+California had the most murders. But does this mean it is the most dangerous state? What if it just has many more people than any other state? We can very quickly confirm that, indeed, California has the largest population:
 
 ```{r}
 murders$state[which.max(murders$population)]
 ```
 
-with over `r floor(max(murders$population)/10^6)` million inhabitants! It is thereforeunfair to compare the totals if we are interested in learning how safe the state is.
+with over `r floor(max(murders$population)/10^6)` million inhabitants! It is therefore unfair to compare the totals if we are interested in learning how safe the state is.
 
 What we really should be computing is the murders per capita. The reports we describe in the motivating section used murders per 100,000 as the unit. To compute this quantiy, the powerful vector arithmetic capabilities of R come in handy.
 
