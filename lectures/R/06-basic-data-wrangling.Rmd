@@ -1,0 +1,93 @@
+## Basic Data Wrangling
+
+Up to now we have been changing vectors by reordering them and subsetting them through indexing. But once we start more advanced analyses, we will want to prepare data tables for data analysis. We refer to the task as data wrangling. 
+For this purpose we will introduce the `dplyr` package which provides intuitive functionality for working with tables. In Chapter [xx] we will cover the `dplyr` package in much more depth. 
+
+Once you install `dplyr` you can load it using 
+
+```{r}
+library(dplyr)
+```
+
+This package introduces functions that perform the most common operations in data warngling and uses names for these functions that are relatively easy to remember. For example to change the data table by adding a new column we use `mutate`, to filter the data table to subset of rows we use `filter` and to subset the data by selecting specific columns we use `select`. We can also perform a series of operation, for example select and then filter, by sending the results of one function to another using a what is called the _pipe operator_: `%>%`Some details are included below. 
+
+### Adding a column with `mutate`
+
+We want all the necessary information for our analysis to be included in the data table. So the first task is to add the murder rate to our data frame.  The function mutate takes the data frame as a first argument and the name and values of the variable in the second using the convention `name = values`. So to add murder rate we use:
+ 
+```{r,message=FALSE}
+murders <- mutate(murders, rate = total / population * 100000)
+```
+
+Note that here we used `total` and `population` in the function, which are objects that are **not** defined in our workspace. What is happening is that `mutate` knows to look for these variables in the `murders` data frame. So the intuitive line of code above does exactly what we want. We can see the new column is added:
+
+```{r}
+head(murders)
+```
+
+Also note that we have over-written the original `murders` object. However, this does *not* change the object that is saved and we load with `data(murders)`. If we load the `murders` data again, the original will over-write our mutated version.
+
+Note: If we reload the dataset from the `dslabs` package it will rewrite our new data frame with the original.
+
+### Subsetting with `filter`
+
+Now suppose that we want to filter the data table to only show the entries for which the murder rate is lower than 0.71. To do this we use the `filter` function which takes the data table as argument and then the conditional statement as the next. Like mutate, we can use the data table variable names inside the function and it will know we mean the columns and not objects in the Workspace.
+
+```{r}
+filter(murders, rate <= 0.71)
+```
+
+
+### Selecting columns with `select`
+
+Although our data table only has six columns, some data tables include hundreds. If we want to view just a few we can use the `select` function. In the code below we select three columns, assign this to a new object and then filter the new object: 
+
+```{r}
+new_table <- select(murders, state, region, rate)
+filter(new_table, rate <= 0.71)
+```
+
+Note that in the call to `select`, the first argument, `murders`, is an object but `state`, `region`, and `rate` are variable names. 
+
+### The pipe: `%>%`
+
+In the code above we want to show the three variables for states that have murder rates below 0.71. To do this we defined an intermediate object. In `dplyr` we can write code that looks more like our description of what we want to: 
+
+>> original data $\rightarrow$ select $\rightarrow$ filter
+
+For such operation, we can use the pipe `%>%`. The code looks like this:
+
+```{r}
+murders %>% select(state, region, rate) %>% filter(rate <= 0.71)
+```
+
+This line of code is equivalent to the two lines of code above. Note that when using the pipe we no longer need to specify the required argument as the `dplyr` functions assume that whatever is being _piped_ is what should be operated on.
+
+### Creating a data frame
+
+It is sometimes useful for us to create our own data frames. You can do this using the `data.frame` function:  
+
+```{r}
+grades <- data.frame(names = c("John", "Juan", "Jean", "Yao"), 
+                     exam_1 = c(95, 80, 90, 85), 
+                     exam_2 = c(90, 85, 85, 90))
+grades
+```
+
+*Warning*: By default the function `data.frame` turns characters into factors:
+```{r}
+class(grades$names)
+```
+
+To avoid this we use the rather cumbersome argument `stringsAsFactors`:
+```{r}
+grades <- data.frame(names = c("John", "Juan", "Jean", "Yao"), 
+                     exam_1 = c(95, 80, 90, 85), 
+                     exam_2 = c(90, 85, 85, 90),
+                     stringsAsFactors = FALSE)
+class(grades$names)
+```
+
+
+Now that we understand the basics of data frames we are ready to continue our quest to characterize each state as it relates to gun murders.  A naive approach to determining the most dangerous state would be to 
+
