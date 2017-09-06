@@ -31,9 +31,12 @@ see what is in store. The work flow will be pretty simple.
 2. Click on the repository you want to work on. For 
 example `<your_GitHub_username>-2017HW1` for Homework 1. 
 
-3. Copy the link near the top of the page.
+3. Copy the link near the top of the page that is revealed after clicking 'clone or download'.
 
-4. In RStudio, start a new project: File > New Project > Version Control > Git. In the "repository URL" paste the URL of the homework repository you just copied. Take charge of – or at least notice! – the local directory for the Project. A common rookie mistake is to have no idea where you are saving files or what your working directory is. Pay attention. Be intentional. Personally, I suggest you check “Open in new session”.
+ <center><img src="./images/git-clone.png" alt="gitclean" style="width: 600px;"/></center>
+
+4. In RStudio, start a new project: File > New Project > Version Control > Git. In the "repository URL" paste the URL of the homework repository you just copied. Take charge of – or at least notice! – the local directory for the Project. A common rookie mistake is to have no idea where you are saving files or what your working directory is. Pay attention. Be intentional. Personally, I suggest you check “Open in new session” and to keep 
+all your homework repositories in a 'BST260' folder.
 
 5. Click "Create Project". You should now see the files in the repository in the lower right window in RStudio. Also notice the Git tab in the upper right window.
 
