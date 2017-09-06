@@ -48,7 +48,7 @@ change directories into your BST260 folder.
 Move into that directory with `cd` (shown in the last line of the previous image). 
 
 7. If you type `git status` it will give you the current status of your 
-directory. It should look something like this (note that this screenshot is from last year's course and contains HW2 and 2016):
+directory. It should look something like this:
 
  <center><img src="./images/gitclean.png" alt="gitclean" style="width: 700px;"/></center>
 
@@ -64,12 +64,16 @@ you will see that something has changed when you type `git status`:
 
  <center><img src="./images/gituntracked.png" alt="gitclean" style="width: 700px;"/></center>
 
-You will notice that there are two `untracked files`, these are here 
-because I created these two files in the homework repository. (Again, this is from last year's course. You would see files relating to HW1 and 2017).
-In order to get git to track changes on these files we need to 
-add them. So we type :
+You will notice that there is one `untracked file`.
+In order to get git to track changes in this file we need to 
+add it. So we type :
 
-> `$ git add HW2_Problems.Rmd HW2_Problems.html `
+> `$ git add HW2_Problems.html `
+
+We also need to add the .Rmd file in order to `stage` it (so that it
+will be included in the next commit). So we type :
+
+> `$ git add HW2_Problems.Rmd `
 
  <center><img src="./images/gitstaged.png" alt="gitclean" style="width: 700px;"/></center>
 
