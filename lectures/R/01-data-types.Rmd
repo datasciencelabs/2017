@@ -7,7 +7,7 @@ a <- 2
 class(a)
 ```
 
-To work efficiently in R it is important to learn the different types of variable and what we can do with these.
+To work efficiently in R it is important to learn the different types of variables and what we can do with these.
 
 ### Data Frames
 
