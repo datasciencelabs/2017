@@ -45,7 +45,7 @@ change directories into your BST260 folder.
 <center><img src="./images/mkdir-clone.png" alt="gitclean" style="width: 600px;"/></center>
 
 6. You should now see a new directory called `<your_GitHub_username>-2017HW1`. 
-Move into that directory with `cd`. 
+Move into that directory with `cd` (shown in the last line of the previous image). 
 
 7. If you type `git status` it will give you the current status of your 
 directory. It should look something like this (note that this screenshot is from last year's course and contains HW2 and 2016):
