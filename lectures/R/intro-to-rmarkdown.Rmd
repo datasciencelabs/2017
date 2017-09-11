@@ -178,7 +178,8 @@ All code chunks have to be re-computed every time you re-knit the file. If you h
 In `knitr`, you can use `purl()` to pull out all of the R code and put it into a single `.R` file. This wiil ignore all prose outside of code chunks. The following code will create a file called `intro-to-rmarkdown.R` in the same directory I'm working in.
 
 ```{r, eval=FALSE}
-purl("intro-to-rmarkdown.R", documentation = 0)
+library(knitr)
+purl("intro-to-rmarkdown.Rmd", documentation = 0)
 ```
 
 
