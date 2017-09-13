@@ -92,7 +92,7 @@ However, note that the US murder is **not** the average of the state murder rate
 
 ### Assessmnet
 
-Compute the countries population using the `summarize` function: 
+Compute the country's murder rate using the `summarize` function, and name it `us_murder_rate`: 
 
 
 This computation counts larger states proportionally to their size and this results in a larger value.
