@@ -51,7 +51,7 @@ We can form two logicals:
 
 ```{r}
 west <- murders$region=="West"
-safe <- murders$rate<=1
+safe <- murder_rate<=1
 ```
 
 and we can use the `&`  to get a vector of logicals that tells us which states satisfy our condition
