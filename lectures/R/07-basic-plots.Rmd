@@ -42,3 +42,24 @@ boxplot(rate~region, data = murders)
 We can see that the South has larger murder rates than the other three regions.
 
 
+### Assessment
+
+
+1. We made a plot of total murders versus population and noted a strong relationship: not surprisingly states with larger populations had more murders.
+
+    ```{r, eval = FALSE}
+    library(dslabs)
+    data(murders)
+    population_in_millions <- murders$population/10^6
+    total_gun_murders <- murders$total
+    plot(population_in_millions, total_gun_murders)
+    ```
+
+    Note that many states have populations below 5 million and are bunched up. We may gain further insights from making this plot in the log scale. Transform the variables using the `log10` transformation and then plot them.
+
+  
+2. Create a histogram of the state populations.
+
+3. Generate boxplots of the state populations by region
+
+    

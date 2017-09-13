@@ -1,5 +1,10 @@
 ## Vector arithmetics
 
+```{r}
+library(dslabs)
+data(murders)
+```
+
 California had the most murders. But does this mean it is the most dangerous state? What if it just has many more people than any other state? We can very quickly confirm that, indeed, California has the largest population:
 
 ```{r}
@@ -70,4 +75,26 @@ Once we do this, we notice that California is no longer near the top of the list
 ```{r}
 murders$state[order(murder_rate)]
 ```
+
+
+### Assessment
+
+
+1. What is `1 + 1/2^2 + 1/3^2 + ... 1/100^2` ? Check if Euler was right.
+
+
+2.Compute the per 100,000 murder rate for each state and store it in the object `murder_rate`. Then compute the average murder rate for the US using the function `mean`. What is the average?
+
+3. Creat this data frame:
+
+    ```{r}
+    temp <- c(35, 88, 42, 84, 81, 30)
+    city <- c("Beijing", "Lagos", "Paris", "Rio de Janeiro", "San Juan", "Toronto")
+    city_temps <- data.frame(name = city, temperature = temp)
+    ```
+
+Remake the data frame using the code above but add a line that converts the temperature from farenheit to celsius.
+
+ 
+
 

@@ -68,3 +68,9 @@ With this call the region variable is no longer a factor but we can easily chang
 dat <- mutate(dat, region =  as.factor(region))
 ```
 
+
+## Assessment
+
+Find or create a spreadsheet on your computer or the internet. Download it and open it in R.
+
+
