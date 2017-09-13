@@ -1,5 +1,10 @@
 ## Indexing
 
+```{r}
+library(dslabs)
+data(murders)
+```
+
 R provides a powerful and convinient way of indexing vectors. We can, for example, subset a vector based on properties of another vector. We continue our us murders example to demonstrate
 
 ### Subsetting with logicals
