@@ -122,7 +122,7 @@ which(murders$state%in%c("New York", "Florida", "Texas"))
 
 4. Now extend the code from exercise 2 and 3 to report the states in the Northeast with murder rates lower than 1. Hint use the previously defined logical vector `low` and the logical operator `&`.
 
-5. In a previous exercise we computed the murder rate for each rate and the average of these numbers. How many states are below the average?
+5. In a previous exercise we computed the murder rate for each state and the average of these numbers. How many states are below the average?
 
 6. Use the match function to identify the states with abbreviations AK, MI, and IA. Hint: Start by defining an index of the entries of `murders$abb` that match the three abbreviations, then use the `[` operator to extract the states.
 
