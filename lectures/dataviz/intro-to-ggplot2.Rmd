@@ -42,7 +42,7 @@ murders %>% ggplot(aes(x = population/10^6, y = total, label = abb)) +
 We are reminded of the saying "a picture is worth a thousand words". Data visualization provides a powerful way to communicate a data-driven finding. In some cases, the visualization is so convincing
 that no follow-up analysis is required. We also note that many wildely used data analysis tools  were initiated by discoveries made via EDA. EDA is perhaps the most important part of data analysis yet often overlooked.
 
-The talks [New Insights on Poverty](https://www.ted.com/talks/hans_rosling_reveals_new_insights_on_poverty?language=en) and [The Best Stats You've Ever Seen](https://www.ted.com/talks/hans_rosling_shows_the_best_stats_you_ve_ever_seen), Hans Roslings forced us to to notice the unexpected with a series of plots related to world health and economics. In his videos, he used animated grpahs to show us how the world was changing and old narratives are no longer true. We will use this data as an example to learn about ggplot2 and datavisualization.
+The talks [New Insights on Poverty](https://www.ted.com/talks/hans_rosling_reveals_new_insights_on_poverty?language=en) and [The Best Stats You've Ever Seen](https://www.ted.com/talks/hans_rosling_shows_the_best_stats_you_ve_ever_seen), Hans Roslings forced us to to notice the unexpected with a series of plots related to world health and economics. In his videos, he used animated grpahs to show us how the world was changing and old narratives are no longer true. We will use this data as an example to learn about ggplot2 and data visualization.
 
 It is also important to note that mistakes, biases, systematic errors and other unexpected problems often lead to data that should be handled with care. Failure to discover these problems often leads to flawed analyses and false discoveries. As an example, 
 consider that measurement devices sometimes fail and that most data analysis 
@@ -54,7 +54,7 @@ reported results, makes data visualization particularly important.
 Data visualization is a powerful approach to detecting these problems. 
 We refer to this particular task as _exploratory data analysis_ (EDA).
 
-Today we will learn the basics of the ggplot2 package. The software we will use to learn the basics of data visualization and exploratory data analysis. We will use motivating examples.  We start by reproducing the murders by state example to learn the basics of ggplot2. Then we will cover t1) world health and economics and (time permitting) and 2) infectious disease trends in the United States.
+Today we will learn the basics of the ggplot2 package. The software we will use to learn the basics of data visualization and exploratory data analysis. We will use motivating examples.  We start by reproducing the murders by state example to learn the basics of ggplot2. Then we will cover 1) world health and economics and (time permitting) and 2) infectious disease trends in the United States.
 
 Note that there is much more to data visualization than what we cover here. More 
 
