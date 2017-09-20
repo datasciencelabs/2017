@@ -351,7 +351,7 @@ for log transformed data we know that the value of $x$ is about 1.5. If the scal
 
 >> ----1----x----10------100---
 
-then, to determine `x`, we need to compute $10^{1.5}$, which is not easy to do in our heads. The advantage of using logged scales is that we see the original values on the axes. However, the advantage of showing logged scales is that the original values are displayed in the plot, which are easier to interpret. For example, we would see "32 dollars a day" instead of "5 log base 2 dollar a day".
+then, to determine `x`, we need to compute $10^{1.5}$, which is not easy to do in our heads. However, the advantage of showing logged scales is that the original values are displayed in the plot, which are easier to interpret. For example, we would see "32 dollars a day" instead of "5 log base 2 dollar a day".
 
 As we learned earlier, if we want to scale the axis with logs we can use the `scale_x_ccontinuous` function. So instead of logging the values first, we apply this layer:
 
