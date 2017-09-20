@@ -572,7 +572,7 @@ heights %>%
 
 Note that we no longer have sharp edges at the interval boundaries and that many of the local peaks have been removed. Also, notice that the scale of the y-axis changed from counts to _density_.
 
-To understand the smooth densities we have to understands _estimates_ a topic we don't cover until a later chapter. However, we provide a heuristic explanation to help you understand the basics and you can use this useful data visualization tool.
+To understand the smooth densities we have to understand _estimation_, a topic we don't cover until later. However, we provide a heuristic explanation to help you understand the basics and you can use this useful data visualization tool.
 
 The main new concept you have to understand is that we assume that our list of observed values comes from a much much larger list of unobserved values. So in the case of heights, you can imagine our list of `r nrow(heights)` students comes from a hypothetical list containing all the heights of all the students in all the world measured very precisely. Let's say there are 1,000,000 of these. This list values, like any list of values, has a distribution and this is really what we want to report to ET since it is much general. Unfortunately we don't get to see it. 
 
@@ -694,7 +694,7 @@ gapminder %>%
 
 In the `r past_year` plot we see two clear modes, poor and rich countries. In `r present_year` it appears that some of the poor countries have shifted towards the right, closing the gap. 
 
-The next message we need to covey is that the reason for this change in distribution is that poor countries became richer rather than some rich countries becoming poorer. To do this all we need to do is assig a color to the groups we identified during data exploration. 
+The next message we need to covey is that the reason for this change in distribution is that poor countries became richer rather than some rich countries becoming poorer. To do this all we need to do is assign a color to the groups we identified during data exploration. 
 
 However, before we can do this we need to  learn how to make these smooth densities in a way that preserves information of how many countries are in each group. To understand why we need this, note the discrepancy in the size of each group:
 
@@ -729,7 +729,7 @@ In ggplot we access these variables by surrounding them the name by `..`. So we 
 aes(x = dollars_per_day, y = ..count..)
 ```
 
-We can now create the desired plot by simply chaging the mapping in the previous code chunk:
+We can now create the desired plot by simply changing the mapping in the previous code chunk:
 
 
 ```{r}
