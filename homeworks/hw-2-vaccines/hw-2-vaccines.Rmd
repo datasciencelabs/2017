@@ -21,7 +21,7 @@ library(dslabs)
 data(us_contagious_diseases)
 ```
 
-1. Use the `us_contagious_disease` and `dplyr` tools to create an object called `dat` that stores only the Measles data, includes a per 100,000 people rate, and removes Alaska and Hawaii since they only became states in the late 50s. Note that there is a `weeks_repoting` column. Take that into account when computing the rate.
+1. Use the `us_contagious_disease` and `dplyr` tools to create an object called `dat` that stores only the Measles data, includes a per 100,000 people rate, and removes Alaska and Hawaii since they only became states in the late 50s. Note that there is a `weeks_reporting` column. Take that into account when computing the rate.
 
 ```{r}
 ## Your code here
@@ -34,7 +34,7 @@ data(us_contagious_diseases)
 ```
 
 
-3. Note these rates start off as counts. For larger counts we can expect more variability. There are statistical explanations for this which we don't discuss here. But transforming the data might help stabilize the variability so that it closer across levels. For 1950, 1960, and 1970
+3. Note these rates start off as counts. For larger counts we can expect more variability. There are statistical explanations for this which we don't discuss here. But transforming the data might help stabilize the variability such that it is closer across levels. For 1950, 1960, and 1970
 plot the histogram of the data across states with and without the square root transformation.  Which seems to have more similar variability across years? Make sure to pick binwidths that result in informative plots.
 
 ```{r}
@@ -42,7 +42,7 @@ plot the histogram of the data across states with and without the square root tr
 ```
 
 
-4. Make a plot from exercise 3 with square root transformation. Make sure that the numbers $0,4,16,36, \dots, 100 appear on the y-axis
+4. Make a plot from exercise 3 with the square root transformation. Make sure that the numbers $0,4,16,36, \dots, 100 appear on the y-axis
 
 
 ```{r}
@@ -69,7 +69,7 @@ Use boxplots to get an idea of the distribution of rates for each year and see i
 ## Your code here
 ```
 
-8. The plots above provide strong evidence showing the benefits of vaccines: as vaccines were introduced, disease rates were reduced. But did autism increase? Find yearly reported autism rates data and provide a plot that shows if it has increased and it the increase coincides with the introduction of vaccines.
+8. The plots above provide strong evidence showing the benefits of vaccines: as vaccines were introduced, disease rates were reduced. But did autism increase? Find yearly reported autism rates data and provide a plot that shows if it has increased and if the increase coincides with the introduction of vaccines.
 
-9. Use data exploration to determine if other diseases, not Measles have enough data to explore the effects of vaccines. Prepare a two page report with as many plots as you think are necessary to provides a case for the benefit of vaccines.
+9. Use data exploration to determine if other diseases (besides Measles) have enough data to explore the effects of vaccines. Prepare a two page report with as many plots as you think are necessary to provide a case for the benefit of vaccines.
 
