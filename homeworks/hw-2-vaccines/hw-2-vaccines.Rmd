@@ -1,7 +1,10 @@
 ---
 title: "Homework 2"
+date: "September 21, 2017"
 output: html_document
 ---
+
+# Homework 2
 
 Vaccines have helped save millions of lives. In the 19th century, before herd immunization was achieved through vaccination programs, deaths from infectious diseases, like smallpox and polio, were common. However, today, despite all the scientific evidence for their importance, vaccination programs have become somewhat controversial.
 
