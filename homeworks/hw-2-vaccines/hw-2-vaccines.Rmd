@@ -33,13 +33,23 @@ data(us_contagious_diseases)
 ## Your code here
 ```
 
-3. These are counts. Notice that for larger counts we can expect more variability since it is harder to count larger numbers of cases. Transforming the data might help stabilize the variability so that it looks about the same for all count levels. Make a plot with a transformation that does this. Hint: Try the square root transformation and make sure that the numbers $0,4,16,36, \dots, 100 appear on the y-axis
+
+3. Note these rates start off as counts. For larger counts we can expect more variability. There are statistical explanations for this which we don't discuss here. But transforming the data might help stabilize the variability so that it closer across levels. For 1950, 1960, and 1970
+plot the histogram of the data across states with and without the square root transformation.  Which seems to have more similar variability across years? Make sure to pick binwidths that result in informative plots.
 
 ```{r}
 ## Your code here
 ```
 
-4. Now, this is just California. Does the pattern hold for other states? 
+
+4. Make a plot from exercise 3 with square root transformation. Make sure that the numbers $0,4,16,36, \dots, 100 appear on the y-axis
+
+
+```{r}
+## Your code here
+```
+
+5. Now, this is just California. Does the pattern hold for other states? 
 Use boxplots to get an idea of the distribution of rates for each year and see if the pattern holds across state.
 
 ```{r}
@@ -47,19 +57,19 @@ Use boxplots to get an idea of the distribution of rates for each year and see i
 ```
 
 
-5. One problem with the boxplot is that it does not let us see state specific trends. Make a plot showing the trend plots for all states in the same plot. Add the US average to the plot. Hint: Note there are missing values in the data.
+6. One problem with the boxplot is that it does not let us see state specific trends. Make a plot showing the trend plots for all states in the same plot. Add the US average to the plot. Hint: Note there are missing values in the data.
 
 ```{r}
 ## Your code here
 ```
 
-6. One problem with the plot above is that we can't distinguish states from each other. There are just too many. We have three variables to show: year, state and rate. If we use the two dimensions to show year and state then we need something other than length or position to show the rates. Try using color. Hint: Use the the geometry `geom_tile` to tile the region with colors representing disease rates. 
+7. One problem with the plot above is that we can't distinguish states from each other. There are just too many. We have three variables to show: year, state and rate. If we use the two dimensions to show year and state then we need something other than length or position to show the rates. Try using color. Hint: Use the the geometry `geom_tile` to tile the region with colors representing disease rates. 
 
 ```{r}
 ## Your code here
 ```
 
-7. The plots above provide strong evidence showing the benefits of vaccines: as vaccines were introduced, disease rates were reduced. But did autism increase? Find yearly reported autism rates data and provide a plot that shows if it has increased and it the increase coincides with the introduction of vaccines.
+8. The plots above provide strong evidence showing the benefits of vaccines: as vaccines were introduced, disease rates were reduced. But did autism increase? Find yearly reported autism rates data and provide a plot that shows if it has increased and it the increase coincides with the introduction of vaccines.
 
-8. Use data exploration to determine if other diseases, not Measles have enough data to explore the effects of vaccines. Prepare a two page report with as many plots as you think are necessary to provides a case for the benefit of vaccines.
+9. Use data exploration to determine if other diseases, not Measles have enough data to explore the effects of vaccines. Prepare a two page report with as many plots as you think are necessary to provides a case for the benefit of vaccines.
 
