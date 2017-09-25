@@ -282,7 +282,7 @@ Now that the points are larger, it is hard to see the labels. If we read the hel
 
 ```{r}
 p + geom_point(aes(population/10^6, total), size = 3) +
-  geom_text(aes(population/10^6, total, label = abb), nudge_x = 1)
+  geom_text(aes(population/10^6, total, label = abb), nudge_x = 2)
 ```
 
 This is preferred as it makes it easier to read the text.
@@ -291,6 +291,14 @@ This is preferred as it makes it easier to read the text.
 #### Assessment
 
 Remake the plot above but 1) flip the variables so that `total` is in the x-axis and `population` is in the y-axis, 2- show the state names instead of the abbreviation and 3) make the points smallers 
+
+```{r}
+murders %>% ggplot() + 
+  geom_point(aes(x=total, y=population/10^6), 
+             size = 0.5) + 
+  geom_text(aes(x=total, y=population/10^6, 
+                label = state))
+```
 
 ### Global aesthetic mappings
 
@@ -385,7 +393,8 @@ We are almost there! All we have to do is color, a legend and optional changes t
 Note that we can change the color of the points using the `col` argument in the `geom_point` function. To facilitate exposition we will redefine `p` to be everything except the points layer:
 
 ```{r}
-p <-  murders %>% ggplot(aes(population/10^6, total, label = abb)) +   
+p <-  murders %>% 
+  ggplot(aes(population/10^6, total, label = abb)) +   
   geom_text(nudge_x = 0.05) + 
   scale_x_log10() +
   scale_y_log10() +
