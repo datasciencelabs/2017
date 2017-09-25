@@ -39,7 +39,8 @@ data(us_contagious_diseases)
 ## Your code here
 ```
 
-4. Make a plot from exercise 3 with the square root transformation. Make sure that the numbers $0,4,16,36, \dots, 100$ appear on the y-axis.
+4. Plot the Measles disease rates per year for California. Use the the square root transformation. Make sure that the numbers $0,4,16,36, \dots, 100$ appear on the y-axis.
+Find out when the Measles vaccine was introduced and add a vertical line to the plot to show this year:
 
 ```{r}
 ## Your code here
