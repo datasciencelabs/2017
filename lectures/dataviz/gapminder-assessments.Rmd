@@ -1,0 +1,44 @@
+### Assessments 1
+
+
+Start by loading the necessary packages and data:
+
+```{r}
+library(tidyverse)
+library(dslabs)
+data(gapminder)
+```
+
+1. Using ggplot and the points layer, create a scatter plot of life expectancy versus fertilty for the African continent in 2012. 
+
+2. Note that there is quite a bit of variability with some African countries doing quite well. And there appears to be three clusters. Use color to dinstinguish the different regions to see if this explains the clusters.
+
+
+3. While most of the countries in the healthier cluster are from Northern Africa, three countries are not. Write code that creates a table showing the country and region for he African countries that in 2012 had fertility rates below 3 and life expectancies above 70. Hint: use filter then select.
+
+
+4. The Vietnam War lasted from 1955 to 1975. Does data support the negative effects of war? Create a time series plot from 1960 to 2010 of life expectancy that includes Vietnam and the United States. Use color to distinguish the two countries. 
+
+
+5. Cambodia was also involved in this conflict and, after the war. Pol Pot and his communist Khmer Rouge too control and ruled Cambodia from 1975 to 1979. He is considered one of the most brutal dictators in history. Does data support this claim? Create a time series plot from 1960 to 2010 of life expectancy for Cambodia. 
+
+
+### Assessment 2
+ 
+6. Create a smooth density for the dollars per day summary for African countries in 2010. Use a log (base 2) scale for the x-axis. Use mutate to create `dollars_per_day` variable, defined as `gdp/population`, then `ggplot` and `geom_density`. 
+
+7. Edit the code above but now use `facet_grid` to show a different density for 1970 and 2010.
+
+
+ 8. Edit the code from the previous exercise to show stacked histograms of each region in Africa. Make sure the densities are smooth by using th `bw = 0.5`. Hint: use the the `fill` and `position` arguments.
+ 
+ 
+9. For 2010 make a scatter plot of infant mortaily rates `infant_mortaility` versus `dollars_per_day` for countries in the African continent. Use color ot denome the regions.
+
+
+10. Edit the code from the previous answer to make the x-axis be in the log (base 2) scale.
+
+11. Note that there is a pretty large variation between African countries. In the extreme cases we  have one country with mortality rates of less than 20 per 1000 and an average income 16 dollars per day and another making about $1 a day and mortality rates above 10%. To find out what countries these are, remake the plot above but this this time show the country name instead of a point. Hint: use `geom_text`.
+    
+12. Edit the code above to see how this changed between 1970 and 2010. Hint: Add a `facet_grid`
+

@@ -267,8 +267,7 @@ labels <- data.frame(country = countries, x = c(1975,1965), y = c(60,72))
 gapminder %>% filter(country %in% countries) %>% 
   ggplot(aes(year, life_expectancy, col = country)) +
   geom_line() +
-  geom_text(data = labels, aes(x, y, label = country), size = 5) +
-  theme(legend.position = "none")
+  geom_text(data = labels, aes(x, y, label = country), size = 5) + theme(legend.position = "none")
 ```
 
 The plot clearly shows how an improvement in life expectancy followed the drops in fertility rates. While in 1960 Germans lived more than 15 years more South Koreans, by 2010 the gap is completely closed. It exemplifies the improvement that many non-western countries have achieved in tha last 40 years.
