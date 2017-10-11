@@ -2,6 +2,7 @@
 
 To help us understand the connection between polls and what we have learned we are going to havea competition which mimics the situation a pollster faces. 
 
+
 We will use an urn instead of voters and to mimic the competion between pollsters for the best predictions that bring them media attention we will offer \$25 dollar prize. The challenge is to guess the spread between the proportion of blue and red beads in this urn:
 
 
@@ -27,6 +28,11 @@ take_poll(25)
 Think about how you would construct your interval based on the data shown above. 
 
 We have just described a simple sampling model for opinion polls. The beads inside the urn represent the individuals that will vote on election day. Those that will vote for the republican candidate are represented with red beads and the democrats with the blue beads. For simplicity assume there are no other colors, that there are just two parties. 
+
+You can take a sample by visiting [this page](https://dgrtwo.shinyapps.io/urn_drawing/)
+
+Once you are ready, submit your answer at [this link](https://docs.google.com/forms/d/e/1FAIpQLSdTt5sSf0G_7wb3LHVZGAejIBdIaOiIGx5d7F3_8FX0V7oQ7w/viewform)
+
 
 ## Populations, samples, parameters and estimates
 
