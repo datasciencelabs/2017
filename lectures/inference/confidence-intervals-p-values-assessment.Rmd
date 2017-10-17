@@ -1,0 +1,57 @@
+### Confidence Intervals and p-values
+
+For these exercises we will use actual polls for the 2016 election. You can load the data from the `dslabs` package 
+
+```{r}
+library(dslabs)
+data("polls_us_election_2016")
+```
+
+Specifically, we will use all the national polls that ended within four two before the election.
+
+```{r, message=FALSE, comment=FALSE}
+library(tidyverse)
+polls <- polls_us_election_2016 %>% filter(enddate >= "2016-10-31" & state == "U.S.") 
+```
+
+1. For the first poll you can obtain the samples size and estimated Clinton percentage with 
+
+```{r}
+N <- polls$samplesize[1]
+X_hat <- polls$rawpoll_clinton[1]/100
+```
+
+Assume there are only two candidates and construct a 95% confidence interval for the election night proportion $p$. 
+
+
+2. Now use `dplyr` to add a confidence intravel as two columns, called them `lower` and `upper`, of the object `poll` then show a Pollster. Show the enddate, pollster, the estimated proportion, and confidence interval columns. Hint: define temporaty columns `X_hat` and `se_hat`. 
+
+3. The final tally for the populare vote was Clinton 48.2%	and Truno 46.1%. Add column, call it `hit`, to the previous table stating if the confidence interval included the true proporiton $p=0.482$ or not. 
+
+
+4. For the table you just created, what proportion of confidence intervals included $p$?
+
+
+5. If these confidence intervals are constructed correctly, and the theory holds up, what proprotion should include $p$?
+
+
+6. Note a much smaller proportion of the polls than expected produce confidence intervals containing $p$. If you look closely at the table, you will see that most polls that fail to include $p$ are underestimating. The reason for this is undecided voters, individuals polled that do not yet know who they will vote for or do not want to say. Because, historically, undecideds divide evenly between the two main candidates on election day, it is  more informative to estimate the spread or the difference beteween the proportion of two candidates $d$, which in this election was $0.482 - 0.461 = 0.021$. Assume that there are only two parties and that $d = 2p - 1$, define
+
+```{r, message=FALSE, comment=FALSE}
+polls <- polls_us_election_2016 %>% filter(enddate >= "2016-10-31" & state == "U.S.")  %>%
+  mutate(d_hat = rawpoll_clinton/100 - rawpoll_trump/100)
+```
+
+and re-do exercise 1 but for the difference:
+
+
+7. Now repeat exercise 3, but for the difference.
+
+
+8. Now repeat exercise 4, but for the difference
+
+
+9. Note that althought the proportion of confidence intervals goes up substantially, it is still lower that 0.95. In the next lecture we learn why this is. To motivate this make a plot of the error, the difference between each poll's estimate and the actual $d=0.021$. Stratify by pollster.
+
+10. Re-do the plot you made for 9 but only for pollsters that took five or more polls.
+

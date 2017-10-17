@@ -1,11 +1,11 @@
 ---
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 ## Bayesian Statistics
 
-```{r}
+```{r, message=FALSE}
 library(tidyverse)
 library(dslabs)
 ds_theme_set()

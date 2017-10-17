@@ -1,6 +1,6 @@
 ## Statistical Models
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
 library(tidyverse)
 library(dslabs)
 ds_theme_set()
@@ -17,9 +17,59 @@ As we described earlier, in the 2012 Nate Silver was giving a Obama a 90% chance
 
 To which Nate Silver responded:
 
+
 >> If you think it's a toss-up, let's bet. If Obama wins, you donate $1,000 to the American Red Cross. If Romney wins, I do. Deal?
 
-How was Mr. Silver so confident. We will demonstrate Mr. Silver saw that Mr. Scarborough did not using a Monte Carlo simulation. We generate results for 12 polls taken the week before the election. We mimic sample sizes from actual polls and construct. We construct and report  95\% confidence intervals for each of the 12 polls:
+How was Mr. Silver so confident. We will demonstrate why Nate Silver was so confident using the entries to our percent of blue beads competition
+
+```{r, message=FALSE}
+library(googlesheets)
+
+gs_beads <- gs_title("Beads Competition (Responses)")
+beads <- gs_read(ss=gs_beads) %>% setNames(c("Timestamp", "name", "estimate", "N", "interval_size")) %>%
+  mutate(estimate = parse_number(estimate))
+```
+
+Who winse the competition?
+```{r}
+p <- 0.429 * 100
+beads <- beads %>% select(-Timestamp) %>%
+  mutate(lower = estimate - interval_size/2, upper = estimate + interval_size/2, size = upper - lower, 
+                 hit = lower <= p & upper >= p,
+                 includes_zero = lower <= 50 & upper >=50) %>% 
+  arrange(desc(hit), size)
+beads
+```
+
+Are these 95% confidence intervals?
+```{r}
+tmp <- data.frame(N = seq(pmax(min(beads$N),20), max(beads$N), len = 100)) %>% mutate(sqrt_N = sqrt(N))
+beads %>% filter(N>0) %>% ggplot(aes(N, size)) + geom_point() + geom_line(data = tmp, aes(N, 100*sqrt(.25)/sqrt_N))
+```
+
+Here is a plot
+
+```{r}
+beads %>% mutate(name = factor(name, levels=rev(unique(name)))) %>%
+  ggplot(aes(x=name, y=estimate)) + 
+  geom_hline(yintercept = p) + 
+  geom_point(col="#00B6EB")+
+  geom_errorbar(aes(ymin=lower, ymax=upper), col="#00B6EB") + 
+  coord_flip() 
+```
+
+What would Nate Silver do?
+
+```{r}
+agg <- beads %>% filter(N>10) %>% summarize(avg = mean(estimate), se = sd(estimate)/sqrt(n()), N = sum(N))
+nate <- data.frame(name = "Nate Silver", estimate = agg$avg, N = agg$N, interval_size = 2*1.96*agg$se) %>%
+  mutate(lower = estimate - interval_size/2, upper = estimate + interval_size/2, size = upper - lower,  
+         hit = lower <= p & upper >= p, includes_zero = lower <= 50 & upper >=50)
+bind_rows(beads, nate)  %>%  arrange(desc(hit), size)
+```
+
+
+We can also demonstrate how Mr. Silver saw that Mr. Scarborough did not using a Monte Carlo simulation. We generate results for 12 polls taken the week before the election. We mimic sample sizes from actual polls and construct. We construct and report  95\% confidence intervals for each of the 12 polls:
 
 ```{r}
 d <- 0.039
@@ -99,30 +149,30 @@ Since the 2008 elections other organizations have started their own election for
 
 
 ```{r, echo=FALSE}
-knitr::include_graphics("inference/img/pollster-2016-predictions.png")
+knitr::include_graphics("img/pollster-2016-predictions.png")
 ```
 
-For example, the Princeton Election Consortium gave Trump less than 1% while the Huffington Post gave him a 2%. In contrast, Fivethirtyeight had this probability at 29%, higher than tossing two coins and getting two heads. By understanding statistical models and how these forecasters use them, we will start to understand how this happened.
+For example, the Princeton Election Consortium gave Trump less than 1% while the Huffington Post gave him a 2%. In contrast, FiveThirtyEight had this probability at 29%, higher than tossing two coins and getting two heads. By understanding statistical models and how these forecasters use them, we will start to understand how this happened.
 
-Although not nearly as interesting as predicting the electoral college, for illustrative purposes we will start by looking at predictions for the popular vote. Fivethirtyeight predicted a 3.6% advantage for Clinton, included the actual result of 2.1% (48.2% to 46.1%) in their interval, and was much more confident about Clinton winning this, giving her a 81.4% chance of winning.
+Although not nearly as interesting as predicting the electoral college, for illustrative purposes we will start by looking at predictions for the popular vote. FiveThirtyEight predicted a 3.6% advantage for Clinton, included the actual result of 2.1% (48.2% to 46.1%) in their interval, and was much more confident about Clinton winning this, giving her a 81.4% chance of winning.
 
 
 ```{r, echo=FALSE}
-knitr::include_graphics("inference/img/popular-vote-538.png")
+knitr::include_graphics("img/popular-vote-538.png")
 ```
 
-We introduce actual data from the 2016 US presidential election to show how models are motivated and build to produce these predictions.
+We introduce actual data from the 2016 US presidential election to show how models are motivated and built to produce these predictions.
 
 ### Poll data
 
-We use public polling data organized by fivethirtyeight for the 2016 presidential election. The data is included as part of of the `dslabs` package:
+We use public polling data organized by FiveThirtyEight for the 2016 presidential election. The data is included as part of of the `dslabs` package:
 
 ```{r}
 data(polls_us_election_2016)
 names(polls_us_election_2016)
 ```
 
-The table includes results for national polls as well as state polls taken during the year before the election. For this first illustrative example, we will filter the data to include national polls that happened during the week before the election. We also remove polls that fivethirtyeight has determined not to be reliable and graded with "B" or less. Some polls have not been graded and we include those:
+The table includes results for national polls as well as state polls taken during the year before the election. For this first illustrative example, we will filter the data to include national polls that happened during the week before the election. We also remove polls that FiveThirtyEight has determined not to be reliable and graded with "B" or less. Some polls have not been graded and we include those:
 
 ```{r}
 polls <- polls_us_election_2016 %>% 
@@ -141,7 +191,7 @@ For illustrative purposes, we will assume that there are only two parties and ca
 
 
 Note that we have `r nrow(polls)` estimates of the spread.  
-The theory we learned tells us that these estimates are a random variable with a probability distribution that is approximately normal. The expected value is the election night spread $d$ and the standard error is $\sqrt{p (1 - p) / N}$. Assuming the urn model we described earlier are good ones, we can use this information to construct a confidence interval based on the aggregated data. The estimated spread is:
+The theory we learned tells us that these estimates are a random variable with a probability distribution that is approximately normal. The expected value is the election night spread $d$ and the standard error is $2\sqrt{p (1 - p) / N}$. Assuming the urn model we described earlier are good ones, we can use this information to construct a confidence interval based on the aggregated data. The estimated spread is:
 
 ```{r}
 d_hat <- polls %>% summarize(d_hat = sum(spread * samplesize) / sum(samplesize)) %>% .$d_hat
@@ -194,7 +244,7 @@ polls %>% group_by(pollster) %>%
   summarize(se = 2 * sqrt( p_hat * (1-p_hat) / median(samplesize)))
 ```
 
-is between 0.018 and 0.033 which agrees with the within poll variation we see. However, there appears to be differences _across the polls_. Note for example how the USC Dornsife/LA Times pollster is predicting a 4%\ win for Trump, while Ipsos is predicting a win larger than 5\%  for Clinton. The theory we learned says nothing about different pollsters producing polls with different expected values. All the polls should have the same expected value. Fivethirtyeight refers to these differences as "house effects". We can also call them _pollster bias_. 
+is between 0.018 and 0.033 which agrees with the within poll variation we see. However, there appears to be differences _across the polls_. Note for example how the USC Dornsife/LA Times pollster is predicting a 4%\ win for Trump, while Ipsos is predicting a win larger than 5\%  for Clinton. The theory we learned says nothing about different pollsters producing polls with different expected values. All the polls should have the same expected value. FiveThirtyEight refers to these differences as "house effects". We can also call them _pollster bias_. 
 
 Rather than use the urn model theory we are instead going to develop a data-driven model. 
 
@@ -251,5 +301,5 @@ round(results*100,1)
 
 Note that our confidence interval is wider now as it incorporates the pollster variability. It does include the election night result of 2.1%. Also note that it was small enough not to include 0 which means we were confident Clinton would win the electoral vote.
 
-Are we know ready to declare a probability of Clinton winning the popular vote? Not yet. In our model $d$ is a fixed parameters so we can't talk about probabilities. To provide probabilities, we will need to learn about Bayesian statistics.
+Are we now ready to declare a probability of Clinton winning the popular vote? Not yet. In our model $d$ is a fixed parameters so we can't talk about probabilities. To provide probabilities, we will need to learn about Bayesian statistics.
 
