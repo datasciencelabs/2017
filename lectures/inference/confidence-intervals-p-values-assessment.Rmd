@@ -51,7 +51,7 @@ and re-do exercise 1 but for the difference:
 8. Now repeat exercise 4, but for the difference
 
 
-9. Note that althought the proportion of confidence intervals goes up substantially, it is still lower that 0.95. In the next lecture we learn why this is. To motivate this make a plot of the error, the difference between each poll's estimate and the actual $d=0.021$. Stratify by pollster.
+9. Note that althought the proportion of confidence intervals goes up substantially, it is still lower that 0.95. In the next lecture we learn why this is. To motivate this make a plot of the error, the difference between each poll's estimate and the actual $d=0.021$. Stratify by pollster. Hint: use   `theme(axis.text.x = element_text(angle = 90, hjust = 1))`
 
 10. Re-do the plot you made for 9 but only for pollsters that took five or more polls.
 

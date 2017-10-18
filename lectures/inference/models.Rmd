@@ -30,9 +30,9 @@ beads <- gs_read(ss=gs_beads) %>% setNames(c("Timestamp", "name", "estimate", "N
   mutate(estimate = parse_number(estimate))
 ```
 
-Who winse the competition?
+Who won the competition?
 ```{r}
-p <- 0.429 * 100
+p <- 0.529 * 100
 beads <- beads %>% select(-Timestamp) %>%
   mutate(lower = estimate - interval_size/2, upper = estimate + interval_size/2, size = upper - lower, 
                  hit = lower <= p & upper >= p,
@@ -61,11 +61,12 @@ beads %>% mutate(name = factor(name, levels=rev(unique(name)))) %>%
 What would Nate Silver do?
 
 ```{r}
-agg <- beads %>% filter(N>10) %>% summarize(avg = mean(estimate), se = sd(estimate)/sqrt(n()), N = sum(N))
-nate <- data.frame(name = "Nate Silver", estimate = agg$avg, N = agg$N, interval_size = 2*1.96*agg$se) %>%
+agg <- beads %>% filter(N>0) %>% summarize(avg = mean(estimate), se = sd(estimate)/sqrt(n()), N = sum(N))
+nate <- data.frame(name = "Nate Silver", estimate = agg$avg, N = agg$N, interval_size = 2*1.96*agg$se,
+                   stringsAsFactors = FALSE) %>%
   mutate(lower = estimate - interval_size/2, upper = estimate + interval_size/2, size = upper - lower,  
          hit = lower <= p & upper >= p, includes_zero = lower <= 50 & upper >=50)
-bind_rows(beads, nate)  %>%  arrange(desc(hit), size)
+beads %>% bind_rows(beads, nate)  %>%  arrange(desc(hit), size)
 ```
 
 
