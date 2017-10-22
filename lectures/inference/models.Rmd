@@ -60,15 +60,14 @@ beads %>% mutate(name = factor(name, levels=rev(unique(name)))) %>%
 
 What would Nate Silver do?
 
-```{r}
+```{r, eval=FALSE}
 agg <- beads %>% filter(N>0) %>% summarize(avg = mean(estimate), se = sd(estimate)/sqrt(n()), N = sum(N))
 nate <- data.frame(name = "Nate Silver", estimate = agg$avg, N = agg$N, interval_size = 2*1.96*agg$se,
                    stringsAsFactors = FALSE) %>%
   mutate(lower = estimate - interval_size/2, upper = estimate + interval_size/2, size = upper - lower,  
          hit = lower <= p & upper >= p, includes_zero = lower <= 50 & upper >=50)
-beads %>% bind_rows(beads, nate)  %>%  arrange(desc(hit), size)
+beads %>% bind_rows(beads, nate)  %>%  arrange(desc(hit), size) %>% View()
 ```
-
 
 We can also demonstrate how Mr. Silver saw that Mr. Scarborough did not using a Monte Carlo simulation. We generate results for 12 polls taken the week before the election. We mimic sample sizes from actual polls and construct. We construct and report  95\% confidence intervals for each of the 12 polls:
 
@@ -269,9 +268,52 @@ one_poll_per_pollster %>%
 
 In the previous section we saw that using the urn model theory to combine these results might not be appropriate due to the pollster effect. Instead we will model this spread data directly.
 
-The new model can also be thought as an urn model although the connection is not as direct. Rather than 0s (republicans) and 1s (democrats) our urn now contains poll results from all possible pollsters. We _assume_ that the expected value of our urn is the actual spread $d=2p-1$. 
+The new model **can also be thought as an urn model** although the connection is not as direct. Rather than 0s (republicans) and 1s (democrats) our urn now contains poll results from all possible pollsters. We _assume_ that the expected value of our urn is the actual spread $d=2p-1$. 
 
-Because rather than 0s and 1s, our urn contains continuous numbers between -1 and 1, the standard deviation of the urn is no longer $\sqrt{p(1-p)}$. Rather than voter sampling variability, the standard error now includes the pollster to pollster variability. Our new urn, also includes the sampling variability from the polling. Regardless, this standard deviation is now an unknown parameter. In statistics textbooks the Greek symbol $\sigma$ is used to represent this parameter. 
+#### Assessment: review of average and standard deviation
+
+Create an urn with 0 (red) and 1(blue) like this:
+```{r}
+x <- rep(c(0,1), c(471, 529))
+```
+
+Note that $p=529/1000 = 0.529$. 
+
+1. Use code to compute the average of the 0s and 1s in the urn. Confirm that it is $0.529$
+
+2. Use code to compute the standard deviation of the 0s and 1s. Remember the definition:  If $\mu$ is the average, then the SD is
+
+$$
+\sqrt{\frac{1}{N} \sum_{i=1}^n (x_i - \mu)^2}
+$$
+Confirm that the standard deviation of the values inside the urn agree with the urn.
+
+$$|1-0| \sqrt{p(1-p)}$$
+
+
+3. Now suppose the urn is as follows:
+
+```{r}
+x <- c(0.485,0.578,0.522,0.536,0.647,0.487,0.625,0.578,0.437,0.492,0.521,0.499,0.612,0.49,0.468,0.481,0.627,0.585,0.541,0.531,0.523,0.456,0.453,0.433,0.468,0.468,0.508,0.534,0.602,0.54,0.523,0.564,0.572,0.599,0.516,0.545,0.507,0.542,0.575,0.569,0.531,0.547,0.504,0.531,0.454,0.454,0.55,0.521,0.474,0.517,0.603,0.476,0.547,0.437,0.49,0.573,0.539,0.526,0.563,0.571,0.538,0.612,0.593,0.584,0.576,0.54,0.527,0.556,0.532,0.532,0.538,0.565,0.524,0.534,0.489,0.524,0.51,0.598,0.559,0.473,0.547,0.508,0.514,0.431,0.568,0.525,0.521,0.53,0.474,0.489,0.471,0.529,0.593,0.575,0.476,0.506,0.481,0.415,0.466,0.599)
+```
+
+What is the average of the urn?
+
+
+4. What is the standard deviation?
+
+
+#### Back to models
+
+When we model more complicated phenomena like outcomes from polls that include pollster bias, we have to make more assumptions that are sometimes challenging to deduce, so we motivate them with data. 
+
+When we model pollster effects, because rather than 0s and 1s, our urn contains continuous numbers between -1 and 1, the standard deviation of the urn is no longer $\sqrt{p(1-p)}$. 
+
+Rather than voter sampling variability, the standard error now includes the pollster to pollster variability. 
+
+Our new urn, also includes the sampling variability from the polling. 
+
+Regardless, this standard deviation is now an unknown parameter. In statistics textbooks the Greek symbol $\sigma$ is used to represent this parameter. 
 
 In summary, we have two unknown parameters: the expected value $d$ and the standard deviation $\sigma$.
 
