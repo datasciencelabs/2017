@@ -34,7 +34,7 @@ polls %>% mutate(X_hat = rawpoll_clinton/100,
                  se_hat = sqrt(X_hat*(1-X_hat)/samplesize),
                  lower = X_hat - qnorm(0.975)*se_hat,
                  upper = X_hat + qnorm(0.975)*se_hat) %>%
-  select(enddate, pollster, X_hat, lower, upper) %>% View
+  select(enddate, pollster, X_hat, lower, upper) %>% head
 ```
 
 3. The final tally for the populare vote was Clinton 48.2%	and Truno 46.1%. Add column, call it `hit`, to the previous table stating if the confidence interval included the true proporiton $p=0.482$ or not. 
@@ -46,7 +46,7 @@ polls %>% mutate(X_hat = rawpoll_clinton/100,
                  lower = X_hat - qnorm(0.975)*se_hat,
                  upper = X_hat + qnorm(0.975)*se_hat,
                  hit = lower <= p & upper >= p) %>%
-  select(enddate, pollster, X_hat, lower, upper, hit) %>% View
+  select(enddate, pollster, X_hat, lower, upper, hit) %>% head
 ```
 
 
@@ -92,7 +92,7 @@ polls %>% mutate(X_hat = (d_hat+1)/2,
   lower = d_hat - qnorm(0.975)*se_hat,
   upper = d_hat + qnorm(0.975)*se_hat,
   hit = lower <= d & upper >= d) %>%
-  select(enddate, pollster, d_hat, lower, upper, hit) %>% View
+  select(enddate, pollster, d_hat, lower, upper, hit) %>% head
 ```
 
 8. Now repeat exercise 4, but for the difference
