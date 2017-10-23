@@ -11,9 +11,9 @@ library(dslabs)
 ds_theme_set()
 ```
 
-What does it mean when an election forecasters tell us that a given candidate has a 90% chance of winning? In the context of the urn model this would be equivalent to stating the the probability $p>0.5$ is 90%. But, as we discussed, in the urn model $p$ is a fixed parameter and it does not make sense to talk about probability. With Bayesian statistics, we assume it is in fact random. 
+What does it mean when election forecasters tell us that a given candidate has a 90% chance of winning? In the context of the urn model this would be equivalent to stating the the probability $p>0.5$ is 90%. But, as we discussed, in the urn model $p$ is a fixed parameter and it does not make sense to talk about probability associated with it. With Bayesian statistics, we assume $p$ is in fact random. 
 
-Forecaster also use models to describe variability at different levels. For example, sampling variability, pollster to pollster variability, day to day variability, and election to election variability. One of the most successful approaches used for this are  hierarchical models, which can be explained in the context of Bayesian statistics.
+Forecasters also use models to describe variability at different levels. For example, sampling variability, pollster to pollster variability, day to day variability, and election to election variability. One of the most successful approaches used for this are  hierarchical models, which can be explained in the context of Bayesian statistics.
 
 ### Bayes theorem
 
@@ -50,7 +50,7 @@ This says that despite the test having 0.99 accuracy, the probability of having 
 
 #### Simulation
 
-The following simulation is meant to help you visualize Bayes Theorem. We start by randomly selecting 100,000 people from a population in which the disease in question has a 5% prevalence.
+The following simulation is meant to help you visualize Bayes Theorem. We start by randomly selecting 100,000 people from a population in which the disease in question has a 0.025% prevalence.
 
 ```{r, echo=FALSE}
 set.seed(3)
@@ -88,8 +88,8 @@ Because there are so many more controls than cases, even with a low false positi
 table(outcome, test)
 ```
 
-From this table we see that the proportion of positive tests that have the disease is `r sum(test=="+" & outcome=="Disease")` out of `r sum(test=="+")`. We can run this over and over again to see that in fact the probability converges to about 0.022
-The proportions of  in the top plot shows $\mbox{Pr}(D=1)$. The bottom left shows $\mbox{Pr}(D=1 \mid +)$ and the bottom right shows $\mbox{Pr}(D=0 \mid +)$.
+From this table we see that the proportion of positive tests that have the disease is `r sum(test=="+" & outcome=="Disease")` out of `r sum(test=="+")`. We can run this over and over again to see that in fact the probability converges to about 0.025
+The proportions of people in the top row show $\mbox{Pr}(D=1)$. The top left shows $\mbox{Pr}(D=1 \mid -)$ and the bottom right shows $\mbox{Pr}(D=0 \mid +)$.
 
 
 ## Bayes in practice
