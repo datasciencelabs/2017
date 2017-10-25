@@ -1,6 +1,6 @@
 ## Election Forecasting
 
-```{r, echo=FALSE, message=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(dslabs)
 ds_theme_set()
