@@ -25,7 +25,7 @@ Pollsters tend to make probabilistic statements about the results of the electio
 
 We assume a hierarchical model similar to what we did to predict the performance of a baseball player
 
-Statistical text books will write the model like this:
+Statistical textbooks will write the model like this:
 $$
 \begin{aligned}
 d &\sim N(\mu, \tau^2) \mbox{ describes our best guess had we not seen any polling data}\\
@@ -67,18 +67,18 @@ This says we are 100\% sure Clinton will win the popular vote which is seems too
 
 ### The general bias 
 
-After elections are over, one can look at the difference between pollster predictions and actual result. An important observation that our model does not take into account, is that it is common to see the general bias that affects many pollsters in the same way. There is no good explanation for this, but we do observe it in historical data: one election the average of polls favor democrats by 2%, the next election they favor republicans by 1%, then next there is no bias, then the next republicans are favored by 3%, and so on. In 2016 the polls were biased in favor of the democrats by 1-2%. 
+After elections are over, one can look at the difference between pollster predictions and actual result. An important observation that our model does not take into account, is that it is common to see the general bias that affects many pollsters in the same way. There is no good explanation for this, but we do observe it in historical data: in one election the average of polls favor democrats by 2%, in the next election they favor republicans by 1%, then in the next there is no bias, then in the next republicans are favored by 3%, and so on. In 2016 the polls were biased in favor of the democrats by 1-2%. 
 
-Although we now this bias term affects our polls, we have no way of knowing what this bias is until election. So we can't correct our polls accordingly. What we can do is include a term in our model that accounts for this variability.
+Although we know this bias term affects our polls, we have no way of knowing what this bias is until election. So we can't correct our polls accordingly. What we can do is include a term in our model that accounts for this variability.
 
 ### Mathematical Representations of models
 
-Suppose we are collecting data from one pollster and we assume there is no general bias. The pollster collects several polls with a sample size of $N$ so we observe several measurements of the spread $X_1, \dots, X_J$. The theory tells us that these random variables have expected value $d$ and $2 \sqrt{p(1-p)/N}$. For reasons that will become clear soon we can represent this model mathematically like this:
+Suppose we are collecting data from one pollster and we assume there is no general bias. The pollster collects several polls with a sample size of $N$ so we observe several measurements of the spread $X_1, \dots, X_J$. The theory tells us that these random variables have expected value $d$ and standard error $2 \sqrt{p(1-p)/N}$. For reasons that will become clear soon we can represent this model mathematically like this:
 
 $$
 X_j = d + \varepsilon_j
 $$
-we use the index $j$ to represent the different polls and we define $\varepsilon_j$ to be a random variable that explains the poll to poll variability introduced by sampling error. To do this we assume ti has  0 and standard error $2 \sqrt{p(1-p)/N}$. If $d$ is 2.1 and the sample size for these polls was 2,000 we can simulate $J=6$ data points from this model like this:
+we use the index $j$ to represent the different polls and we define $\varepsilon_j$ to be a random variable that explains the poll to poll variability introduced by sampling error. To do this we assume it has mean 0 and standard error $2 \sqrt{p(1-p)/N}$. If $d$ is 2.1 and the sample size for these polls was 2,000 we can simulate $J=6$ data points from this model like this:
 
 ```{r}
 set.seed(3)
@@ -89,7 +89,7 @@ p <- (d + 1)/2
 X <- d + rnorm(J,0,2*sqrt(p*(1-p)/N))
 ```
 
-Now suppose we $J=6$ data points from have data from $I=5$ different pollsters. To represent this we know need two indexes, one for pollster and one for the polls each pollster takes. We use $X_{ij}$ with $i$ representing the pollster and $j$ representing the $j$-th poll from that pollster. If we apply the same model we write
+Now suppose we $J=6$ data points from have data from $I=5$ different pollsters. To represent this we need two indexes, one for pollster and one for the polls each pollster takes. We use $X_{ij}$ with $i$ representing the pollster and $j$ representing the $j$-th poll from that pollster. If we apply the same model we write
 
 
 
@@ -157,7 +157,7 @@ data.frame(Spread = as.vector(X) , Pollster = as.factor(rep(1:I, each=J))) %>%
   scale_y_continuous(limit = c(-0.056,0.092))
 ```
 
-Note that $h_i$ is common to all the observed spreads from a specific pollster. Different pollster have a different $h_i$ which explains why we can see the groups of points shift up and down from pollster to pollster.
+Note that $h_i$ is common to all the observed spreads from a specific pollster. Different pollsters have a different $h_i$ which explains why we can see the groups of points shift up and down from pollster to pollster.
 
 Now, in the model above we assume the average house effect is 0. We think that for every pollster biased in favor of our party there is another favored for the other and assume the standard deviation is $\sigma_h$. But historically we see that every election has a general bias affecting all polls. We can observe this with the 2016 data, but if we collect historical data we see that the average of polls misses by more than models like the one above predict. To see this we would take for each election year, the average of polls and compare it to the actual value. If we did this we would see difference with standard deviation of between 2-3%. To incorporate this into the model we can add another term to account for this variability  
 $$
@@ -179,7 +179,7 @@ An implication of adding this term to the model is that the standard deviation f
 sd(one_poll_per_pollster$spread)
 ```
 
-since we have to add $\sigma_b$
+since we have to add $\sigma_b$.
 
 And note that 
 
@@ -192,7 +192,7 @@ which implies that the standard deviation of $\bar{X}$ is
 $$
 \sqrt{\sigma^2/N + \sigma_b^2}
 $$
-Because the same $b$ is in every measurement, the average does not reduce its variance. This is an important point: it does not matter how many polls you take, this bias does not get reduced.
+Because the same $b$ is in every measurement, the average does not reduce its variance. This is an important point: **it does not matter how many polls you take; this bias does not get reduced**.
 
 If we redo the Bayesian calculation taking this variability into account we get a result much closer to Fivethirtyeight:
 ```{r}
@@ -219,7 +219,7 @@ results_us_election_2016 %>% top_n(5, electoral_votes)
 
 With some minor exceptions we don't discuss, the electoral votes are won all or nothing. For example, if you win California by just 1 vote, you still get all 55 of its electoral votes. This means that by winning a few big states by a large margin but losing many small states by a small margins, you can win the popular vote and lose the electoral college. This happened in 1876, 1888, 2000 and 2016. The idea behind this is to avoid a few large states having the power to dominate the presidential election. But many in the US consider the electoral college unfair and would like to see a change. 
 
-We are now ready to predict the electoral college result for 2016. We start by aggregating results from poll taken during the last week before the election:
+We are now ready to predict the electoral college result for 2016. We start by aggregating results from polls taken during the last week before the election:
 
 ```{r}
 results <- polls_us_election_2016 %>%
@@ -233,13 +233,13 @@ results <- polls_us_election_2016 %>%
   mutate(state = as.character(state))
 ```
 
-Here are the 10 closes races according to the polls:
+Here are the 10 closest races according to the polls:
 
 ```{r}
 results %>% arrange(abs(avg))
 ```
 
-We now introduce the command `left_join` that will let us easily add the number of electoral votes for each state from the data set `us_electoral_votes_2016`. We will describe this function in detail in the Wrangling Chapter. Here we simple say that the function combines the two datasets so that the information from the second argument is added to the information in the first:
+We now introduce the command `left_join` that will let us easily add the number of electoral votes for each state from the data set `us_electoral_votes_2016`. This function combines the two datasets so that the information from the second argument is added to the information in the first:
 
 ```{r}
 results <- left_join(results, results_us_election_2016, by = "state")
@@ -272,7 +272,7 @@ results %>% mutate(sigma = sd/sqrt(n),
   arrange(abs(posterior_mean))
 ```
 
-Note that the estimates based on posterior does move the estimates towards 0, although the states with many polls are influenced less. This is expected as the more poll data we collect the more we trust those results:
+Note that the estimates based on the posterior do move toward 0, although the states with many polls are influenced less. This is expected as the more poll data we collect the more we trust those results:
 
 ```{r}
 results %>% mutate(sigma = sd/sqrt(n), 
@@ -283,7 +283,7 @@ results %>% mutate(sigma = sd/sqrt(n),
   geom_abline(slope = 1, intercept = 0)
 ```
 
-Now we repeat this 10,000 times and generate an outcome from the posterior. Here we keep the total number of electoral votes for Clinton adding 7 to account for Rhode Island and D.C.:
+Now we repeat this 10,000 times and generate an outcome from the posterior. Here we keep the total number of electoral votes for Clinton, adding 7 to account for Rhode Island and D.C.:
 ```{r, cache=TRUE}
 mu <- 0
 tau <- 0.02
@@ -327,7 +327,7 @@ clinton_EV_2 <- replicate(1000, {
                    posterior_se = sqrt( 1/ (1/sigma^2 + 1/tau^2)),
                    simulated_result = rnorm(length(posterior_mean), posterior_mean, posterior_se),
                    clinton = ifelse(simulated_result>0, electoral_votes, 0)) %>% 
-    summarize(clinton = sum(clinton) + 7) %>% .$clinton ## 7 for Rhode Island and D.C.
+    summarize(clinton = sum(clinton) + 7) %>% .$clinton ## add 7 for Rhode Island and D.C.
 })
 mean(clinton_EV_2>269)
 ```
@@ -350,7 +350,7 @@ Fivethirtyeight includes many other feature we do not include here.  One is that
 
 ### Forcasting
 
-Forecaster like to make predictions well before the election. The predictions are adapted as new polls come out. However, an important questions forecasters must ask is: how informative are polls taken several weeks before the election? Here we study the variability of poll results across time.
+Forecasters like to make predictions well before the election. The predictions are adapted as new polls come out. However, an important questions forecasters must ask is: how informative are polls taken several weeks before the election? Here we study the variability of poll results across time.
 
 
 To make sure the variability we observe is not due to pollster effects, let's study data from one pollster:
@@ -361,7 +361,7 @@ one_pollster <- polls_us_election_2016 %>%
   mutate(spread = rawpoll_clinton/100 - rawpoll_trump/100)
 ```
 
-Since there is not pollster effect, then perhaps the theoretical standard error matches the data-derived standard deviation. We compute both here:
+Since there are no pollster effects, then perhaps the theoretical standard error matches the data-derived standard deviation. We compute both here:
 
 ```{r}
 se <- one_pollster %>% 
@@ -400,7 +400,7 @@ polls_us_election_2016 %>%
   geom_point(aes(color=pollster), show.legend = FALSE, alpha=0.6) 
 ```
 
-This implies that, if we are going to forecast, our model must include a term to model that accounts for the time effect. We would write a model including a bias term for time:
+This implies that, if we are going to forecast, our model must include a term that accounts for the time effect. We would write a model including a bias term for time:
 
 $$
 Y_{ijt} = d + b + h_j + b_t + \varepsilon_{ijt}
@@ -408,7 +408,7 @@ $$
 
 The standard deviation of $b_t$ would depend on $t$ since the closer we get to election day the smaller this bias term should. 
 
-Pollster also try to estimate trends, call them $f(t)$, from these data and incorporate these into their predictions. The blue lines in the plots above 
+Pollsters also try to estimate trends, call them $f(t)$, from these data and incorporate these into their predictions. The blue lines in the plots above 
 
 
 $$
@@ -433,4 +433,4 @@ polls_us_election_2016 %>%
   scale_y_continuous(limits = c(30,50))
 ```
 
-Once a model, like the one above is selected, we can use historical and present data to estimate all the necessary parameters to make predictions. There are a variety of methods for fitting models which we don't discuss here. In a later chapter we discuss some of these methods.
+Once a model, like the one above is selected, we can use historical and present data to estimate all the necessary parameters to make predictions. There are a variety of methods for fitting models which we don't discuss here. 
