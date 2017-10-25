@@ -23,11 +23,10 @@ To which Nate Silver responded:
 How was Mr. Silver so confident. We will demonstrate why Nate Silver was so confident using the entries to our percent of blue beads competition
 
 ```{r, message=FALSE}
-library(googlesheets)
-
-gs_beads <- gs_title("Beads Competition (Responses)")
-beads <- gs_read(ss=gs_beads) %>% setNames(c("Timestamp", "name", "estimate", "N", "interval_size")) %>%
-  mutate(estimate = parse_number(estimate))
+beads <- read_tsv("http://bit.ly/f2017-bst260-beads")
+beads <- beads %>% 
+    setNames(c("Timestamp", "name", "estimate", "N", "interval_size")) %>%
+    mutate(estimate = parse_number(estimate))
 ```
 
 Who won the competition?
