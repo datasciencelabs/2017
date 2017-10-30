@@ -7,9 +7,9 @@ ds_theme_set()
 set.seed(0)
 ```
 
-Up to this point, we have focused mainly on _univariate_ variables. However, in data science applications it is very common to be interested in the relationship between two or more variables. For instance, in our baseball example we are interested in the relationship between bases on balls and runs. We will come back to this example, but we introduce necessary concepts needed to understand regression using a simpler example. We actually use the dataset from which regression was born.
+Up to this point, we have focused mainly on _univariate_ variables. However, in data science applications it is very common to be interested in the relationship between two or more variables. For instance, in our baseball example we are interested in the relationship between bases on balls and runs. We will come back to this example, but first we introduce necessary concepts needed to understand regression using a simpler example. We will actually use the dataset from which regression was born.
 
-The example is from Genetics. [Francis Galton](https://en.wikipedia.org/wiki/Francis_Galton) studied the variation and heredity of human traits. Among many other traits, Galton collected and studied height data from families to try to understand heredity. While doing this, he developed the concepts of correlation and regression and a connection to pairs of data that follow a normal distribution. Or course, at the time this data was collected, our knowledge regarding genetics was much limited than what we know today. A very specific question Galton tried to answer was how well can we predict a son's height based on the parents' height. The technique he developed to answer this question, regression, can also be applied to our baseball question: do bases on ball predict runs?
+The example is from Genetics. [Francis Galton](https://en.wikipedia.org/wiki/Francis_Galton) studied the variation and heredity of human traits. Among many other traits, Galton collected and studied height data from families to try to understand heredity. While doing this, he developed the concepts of correlation and regression and a connection to pairs of data that follow a normal distribution. Of course, at the time this data was collected, our knowledge regarding genetics was much more limited than what we know today. A very specific question Galton tried to answer was how well can we predict a son's height based on the parents' height. The technique he developed to answer this question, regression, can also be applied to our baseball question: do bases on ball predict runs?
 
 We have access to Galton's family height data through the `HistData` package. We will create a dataset with the heights of fathers and the first son of each family.
 
@@ -47,7 +47,7 @@ The correlation coefficient is defined for a list of pairs $(x_1, y_1), \dots, (
 $$
 \rho = \frac{1}{n} \sum_{i=1}^n \left( \frac{x_i-\mu_x}{\sigma_x} \right)\left( \frac{y_i-\mu_y}{\sigma_y} \right)
 $$
-with $\mu_x, \mu_y$ the averages of $x_1,\dots, x_n$ and $y_1, \dots, y_n$ respectively and $\sigma_x, \sigma_y$ the standard deviations. The Greek letter $\rho$ is commonly used in statistics books to denote the correlation. The reason is that $\rho$ is the Greek letter for $r$, the first letter of regression. Soon we learn about the connection between correlation and regression.
+with $\mu_x, \mu_y$ the averages of $x_1,\dots, x_n$ and $y_1, \dots, y_n$ respectively, and $\sigma_x, \sigma_y$ their standard deviations. The Greek letter $\rho$ is commonly used in statistics books to denote the correlation. The reason is that $\rho$ is the Greek letter for $r$, the first letter of regression. Soon we learn about the connection between correlation and regression.
 
 To understand why this equation does in fact summarize how two variables move together, consider the $i$-th entry of $x$ is  $\left( \frac{x_i-\mu_x}{\sigma_x} \right)$ SDs away from the average. Similarly, the $y_i$ that is paired with $x_i$, is $\left( \frac{y_1-\mu_y}{\sigma_y} \right)$ SDs away from the average $y$. If $x$ and $y$ are unrelated, the product $\left( \frac{x_i-\mu_x}{\sigma_x} \right)\left( \frac{y_i-\mu_y}{\sigma_y} \right)$ will be positive ( $+ \times +$ and $- \times -$ ) as often as negative ($+ \times -$ and $- times +$) and will average out to about 0. This correlation is the average and therefore unrelated variables will have 0 correlation. If instead the quantities vary together, then we are averaging mostly positive products ( $+ \times +$ and $- \times -$) and we get a positive correlation. If they vary in opposite directions, we get a negative correlation. 
 
@@ -115,9 +115,9 @@ and that it has a relatively high standard error relative to its size.
 sd(R)
 ```
 
-That there large, relative to its difference from 0, standard deviation is something to keep in mind when interpreting correlations.
+A large standard deviation, relative to its difference from 0, is something to keep in mind when interpreting correlations.
 
-Also note that because the sample correlation is an average of independent draws, the central limit actually applies. Therefore, for large enough $N$, the distribution of `R` is approximately normal with expected value $\rho$. The standard deviation is somewhat complex to derive: it is $\sqrt{\frac{1-r^2}{N-2}}$. 
+Also note that because the sample correlation is an average of independent draws, the central limit theorem actually applies. Therefore, for large enough $N$, the distribution of `R` is approximately normal with expected value $\rho$. The standard deviation is somewhat complex to derive: it is $\sqrt{\frac{1-r^2}{N-2}}$. 
 
 
 In our example, $N=25$ does not seem to be large enough to make the approximation a good one:
@@ -156,7 +156,7 @@ Suppose we are asked to guess the height of a randomly selected son and we don't
 
 It turns out that if we were able to collect data from a very large number of fathers that are 72 inches, the distribution of their sons' heights would be normally distributed. This implies that the average of this distribution would be our best prediction. Can we figure out what this average is?
 
-We call this approach _stratifying_ or _conditioning_. The distribution of the strata is called the _conditional distribution_ and the average of this distribution the _conditional aveage_. In our case we are computing the average son height _conditioned_ on the father being 72 inches tall. A challenge when using this approach in practice is that for continuous data, we don't have many data points matching exactly one value. For example, we have only: 
+We call this approach _stratifying_ or _conditioning_. The distribution of the strata is called the _conditional distribution_ and the average of this distribution the _conditional average_. In our case we are computing the average son height _conditional_ on the father being 72 inches tall. A challenge when using this approach in practice is that for continuous data, we don't have many data points matching exactly one value. For example, we have only: 
 
 ```{r}
 sum(galton_heights$father == 72)
@@ -180,8 +180,8 @@ conditional_avg
 ```
 
 
-Note that a 72 inch father is taller than average. Specifically, (72 - `mean(galton_heights$father)`/`sd(galton_heights$father)` =
-`r (72 -mean(galton_heights$father))/sd(galton_heights$father)` standard deviations taller than the average father. Our prediction `r conditional_avg` is also taller than average, but only `r (conditional_avg - mean(galton_heights$son)) /sd(galton_heights$son)` standard deviations larger than the average son. The sons of 72 inch fathers have _regressed_ some to the average height. We notice that the reduction in how much taller is about 0.5, which happens to be the correlation. As we will see, this is not a coincidence.
+Note that a 72 inch father is taller than average. Specifically, `(72 - mean(galton_heights$father))`/`sd(galton_heights$father)` =
+`r (72 -mean(galton_heights$father))/sd(galton_heights$father)` standard deviations taller than the average father. Our prediction `r conditional_avg` is also taller than average, but only `r (conditional_avg - mean(galton_heights$son)) /sd(galton_heights$son)` standard deviations larger than the average son. The sons of 72 inch fathers have _regressed_ some to the average height. We notice that the reduction in how much taller is about 0.5 standard deviations, which happens to be the correlation. As we will see, this is not a coincidence.
 
 If we want to make a prediction of any height, not just 72, we could apply the same approach to each strata. Stratification followed by boxplots lets us see the distribution of each group:
 
@@ -221,7 +221,7 @@ In the next section we explain the line these averages appear to follow is what 
 
 ### The regression line
 
-If we are predicting a random variable $Y$ knowing the value of another $X=x$ using a regression line, then we predict that for every standard deviation, $\sigma_X$, that $x$ increases above the average $mu_X$, $Y$ increase $\rho$ standard deviations $\sigma_Y$ above the average $\mu_Y$ with $\rho$ the correlation between $X$ and $Y$. The formula for the regression is therefore:
+If we are predicting a random variable $Y$ knowing the value of another $X=x$ using a regression line, then we predict that for every standard deviation, $\sigma_X$, that $x$ increases above the average $mu_X$, $Y$ increases $\rho$ standard deviations $\sigma_Y$ above the average $\mu_Y$, where $\rho$ is the correlation between $X$ and $Y$. The formula for the regression is therefore:
 
 $$ 
 \left( \frac{Y-\mu_Y}{\sigma_Y} \right) = \rho \left( \frac{x-\mu_X}{\sigma_X} \right)
@@ -238,7 +238,6 @@ If there is perfect correlation, we predict an increase that is the same number 
 Note that if the correlation is positive and lower than 1, our prediction is closer, in standard units, to the average height than the value using to predict, $x$, is to the average $x$. This is why we call it _regression_: the son regresses to the average height. In fact, the title of Galton's paper was:
 
 >> Regression toward mediocrity in hereditary stature
-
 
 To add regression lines to plots, we will need the above formula in the form: 
 
@@ -322,7 +321,7 @@ sd(conditional_avg, na.rm = TRUE)
 sd(regression_prediction)
 ```
 
-The regression line is therefore much more stable than the conditional mean. There is an intuitive reason for this. The conditional average is computed on a relatively small subset: the fathers that are about 72 inches tall. In fact, in some of the permutations we have no data, which is why we use `na.rm=TRUE`. The regression always uses all the data. So why not always use the regression for prediction? Because it is not always appropriate. For example, Anscombe provided cases for which the data does not have a linear relationship. So are we justified in using the regression line to predict? Galton answered this in the positive for height data.
+The regression line is therefore much more stable than the conditional mean. There is an intuitive reason for this. The conditional average is computed on a relatively small subset: the fathers that are about 72 inches tall. In fact, in some of the permutations we have no data, which is why we use `na.rm=TRUE`. The regression always uses all the data. So why not always use the regression for prediction? Because it is not always appropriate. For example, Anscombe provided cases for which the data does not have a _linear_ relationship. So are we justified in using the regression line to predict? Galton answered this in the positive for height data.
 
 ## Bivariate normal distribution 
 
@@ -347,11 +346,11 @@ A more technical way to define the bivariate normal distribution is the followin
 
 When we fix $X=x$ in this way we then refer to the resulting distribution of the $Y$s in the strata as the _conditional distribution_ of $Y$ given $X=x$. We write it like notation like this:
 
-$$ f_{Y \mid X=x} \mbox{ is the notation for conditional distribution and } \mbox{E}(Y \mid X=x) \mbox{ is the notation for conditional expected value.}$$
+$f_{Y \mid X=x}$ is the notation for conditional distribution and $\mbox{E}(Y \mid X=x)$ is the notation for conditional expected value.
 
 If we think the height data is well approximated by the bivariate normal distribution, then we should see the normal approximation hold for each strata. Here we stratify the son heights by the standardized father heights and see that the assumption appears to hold:
 
-```{r qqnorm-of-strata, fig.cap="qqplots of son heights for four strata defined by father heights.",fig.width=7.5,fig.height=7.5}
+```{r qqnorm-of-strata, fig.cap="qqplots of son heights for four strata defined by father heights",fig.width=7.5,fig.height=7.5}
 galton_heights %>%
   mutate(z_father = round((father - mean(father))/sd(father))) %>%
   filter(z_father %in% -2:2) %>%
