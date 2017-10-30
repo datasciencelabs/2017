@@ -8,7 +8,7 @@ Baseball teams use _scouts_ to help them decide what players to hire. These scou
 
 In 1989-1991, the A's had one of the highest payrolls in baseball. They were able to buy the best players and during that time they were one of the best teams in baseball. However, in 1995 the A's team owner changed and the new management cut the budget drastically, leaving then general manager, Sandy Alderson, with one of the lowest payrolls in baseball. He could no longer afford the most sought after players. Alderson began using a statistical approach to find inefficiencies in the market. Alderson was a mentor to Billy Beane, who succeeded him in 1998 and fully embraced data science, as opposed to scouts, as a method for finding low cost players that data predicted would help the team win. Today this strategy has been adapted by most baseball teams. As we will see, regression plays a large role in this approach.
 
-As motivation for this chapter, we will go back to 2002 and try to build a baseball team with a limited budget. Note that, in 2002, the Yankees' payroll of \$125,928,583 more than tripled the Oakland A's \$39,679,746  [budget](http://www.baseballchronology.com/Baseball/Years/2002/Payroll.asp).
+As motivation for this lecture, we will go back to 2002 and try to build a baseball team with a limited budget. Note that, in 2002, the Yankees' payroll of \$125,928,583 more than tripled the Oakland A's \$39,679,746  [budget](http://www.baseballchronology.com/Baseball/Years/2002/Payroll.asp).
 
 
 Statistics have been used in baseball since its beginnings. The dataset we will be using, included in the `Lahman` library, goes back to the 19th century. For example, a summary statistics we will describe soon, _Batting average_, has been used to summarize a batter's success for decades. [Other statistics](http://mlb.mlb.com/stats/league_leaders.jsp) such as home runs (HR), runs batted in (RBI), and stolen bases (SB) are reported for each player in the game summaries included in the sports section of newspapers, with players rewarded for high numbers.
@@ -18,11 +18,11 @@ Although summary statistics were widely used in baseball, data analysis per se w
 This changed with [Bill James](https://en.wikipedia.org/wiki/Bill_James). In the late 1970s, this aspiring writer and baseball started publishing articles describing more in-depth analysis of baseball data. He named the approach of using data to predict what outcomes best predicted if a team won [sabermetrics](https://en.wikipedia.org/wiki/Sabermetrics). Until Billy Beane made sabermetrics the center of his baseball operation, Bill James' work was mostly ignored by the baseball world. Today almost every team uses the approach, which has now gone beyond baseball into other sports.
 
 
-```{r, echo = FALSE, eval=FALSE}
+```{r, echo = FALSE}
 knitr::include_graphics("http://cdn.fansided.com/wp-content/blogs.dir/17/files/2011/12/bill-james-079006079.jpg")
 ```
 
-In this chapter, to simplify the exercise, we will focus on scoring runs and ignore pitching and fielding. We will see how regression analysis can help develop strategies to build a competitive baseball team with a constrained budget. The approach can be divided into two separate data analyses. In the first, we determine which recorded player-specific statistics predict runs. In the second, we examine if players were undervalued based on what our first analysis predicts. 
+In this lecture, to simplify the exercise, we will focus on scoring runs and ignore pitching and fielding. We will see how regression analysis can help develop strategies to build a competitive baseball team with a constrained budget. The approach can be divided into two separate data analyses. In the first, we determine which recorded player-specific statistics predict runs. In the second, we examine if players were undervalued based on what our first analysis predicts. 
 
 ### Baseball basics
 
@@ -34,7 +34,7 @@ Here is a [success](https://www.youtube.com/watch?v=HL-XjMCPfio) and here is a [
 
 Now there are several ways to succeed. Understanding this distinction will be important for our analysis. When the batter hits the ball, he wants to pass as many _bases_ as possible. There are four bases with the fourth one called _home plate_. Home plate is where batters start by trying to hit, so the bases form a cycle.
 
-```{r, echo = FALSE, eval=FALSE}
+```{r, echo = FALSE}
 knitr::include_graphics("http://quarterlyspeedbump.com/wp-content/uploads/2012/03/Baseball_Diamond1.jpeg")
 ```
 

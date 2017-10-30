@@ -1,6 +1,6 @@
 ## Correlation is not causation
 
-```{r}
+```{r,echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(tidyr)
 library(broom)
@@ -8,7 +8,7 @@ library(dslabs)
 ds_theme_set()
 ```
 
-Correlation is not causation is perhaps the most important lesson one learns in a statistics class. In this chapter, we have described tools useful for quantifying associations between variables. However, we must be careful not to overinterpret these associations. 
+Correlation is not causation is perhaps the most important lesson one learns in a statistics class. In this lecture, we have described tools useful for quantifying associations between variables. However, we must be careful not to overinterpret these associations. 
 
 There are many reasons that a variable $X$ can be correlated with a variable $Y$ without either being a cause for the other. Here we examine three common ways that can lead to misinterpreting data.
 
