@@ -117,7 +117,7 @@ sd(R)
 
 A large standard deviation, relative to its difference from 0, is something to keep in mind when interpreting correlations.
 
-Also note that because the sample correlation is an average of independent draws, the central limit theorem actually applies. Therefore, for large enough $N$, the distribution of `R` is approximately normal with expected value $\rho$. The standard deviation is somewhat complex to derive: it is $\sqrt{\frac{1-r^2}{N-2}}$. 
+Also note that because the sample correlation is an average of independent draws, the central limit theorem actually applies. Therefore, for large enough $N$, the distribution of `R` is approximately normal with expected value $\rho$. The standard deviation is somewhat complex to derive: it is $\sqrt{\frac{1-\rho^2}{N-2}}$. 
 
 
 In our example, $N=25$ does not seem to be large enough to make the approximation a good one:
@@ -186,7 +186,8 @@ Note that a 72 inch father is taller than average. Specifically, `(72 - mean(gal
 If we want to make a prediction of any height, not just 72, we could apply the same approach to each strata. Stratification followed by boxplots lets us see the distribution of each group:
 
 ```{r boxplot-1, fig.cap="Boxplot of son heights stratified by father heights."}
-galton_heights %>% mutate(father_strata = factor(round(father))) %>% 
+galton_heights %>% 
+  mutate(father_strata = factor(round(father))) %>% 
   ggplot(aes(father_strata, son)) + 
   geom_boxplot() + 
   geom_point()
@@ -201,7 +202,7 @@ galton_heights %>%
   summarize(son_conditional_avg = mean(son)) %>%
   ggplot(aes(father, son_conditional_avg)) + 
   geom_point()
-```
+?.```
 
 Furthermore, these centers appear to follow a linear relationship. Below we plot the averages of each group. If we take into account that these averages are random variables, with standard errors, it does appear that they follow a straight line:
 
