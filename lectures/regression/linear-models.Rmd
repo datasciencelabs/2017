@@ -15,16 +15,16 @@ galton_heights <- GaltonFamilies %>%
 ```
 
 If we find the regression line for predicting runs from 
-bases on balls we a get slope of `r bb_slope <- Teams %>% filter(yearID %in% 1961:2001 ) %>% mutate(BB_per_game = BB/G, R_per_game = R/G) %>% lm(R_per_game ~ BB_per_game, data = .) %>% .$coef  %>% .[2]; bb_slope`. 
+bases on balls we a get slope of `r bb_slope <- Teams %>% filter(yearID %in% 1961:2001 ) %>% mutate(BB_per_game = BB/G, R_per_game = R/G) %>% lm(R_per_game ~ BB_per_game, data = .) %>% .$coef  %>% .[2]; signif(bb_slope,3)`. 
 
-So does this mean that if we go and hire low salary players with many BB, that increase the number of walks per game by 2, our team will score `r bb_slope*2` more runs per game? 
+So does this mean that if we go and hire low salary players with many BBs, that increase the number of walks per game by 2, our team will score `r signif(bb_slope*2,3)` more runs per game? 
 
-We are again reminded that association is not causation. The data does provide strong evidence that a team with two more BB per game than the average team scores `r bb_slope*2` runs per game. But this does not mean that BB are the cause. 
+We are again reminded that association is not causation. The data does provide strong evidence that a team with two more BBs per game than the average team scores `r signif(bb_slope*2,3)` runs per game. But this does not mean that BBs are the cause. 
 
 If we do compute the regression line slope for singles we get
 `r singles_slope <- Teams %>% filter(yearID %in% 1961:2001 ) %>% mutate(Singles_per_game = (H-HR-X2B-X3B)/G, R_per_game = R/G) %>%  lm(R_per_game ~ Singles_per_game, data = .) %>%  .$coef  %>% .[2]; singles_slope`, a lower value. 
 
-Note that a single gets you to first base just like a BB. Those that know about baseball, will tell you that with a single, runners on base have a better chance of scoring than with BB. So how can BB be more predictive of runs? The reason this happen is because of confounding. Note the correlation between HR, BB, and singles:
+Note that a single gets you to first base just like a BB. Those that know about baseball will tell you that with a single, runners on base have a better chance of scoring than those with a BB. So how can BBs be more predictive of runs? The reason this happen is because of confounding. Note the correlation between HR, BB, and singles:
 
 ```{r}
 Teams %>% 
@@ -33,11 +33,11 @@ Teams %>%
   summarize(cor(BB, HR), cor(Singles, HR), cor(BB,Singles))
 ```
 
-It turns out that pitchers, afraid of HRs, will sometimes avoid throwing strikes to HR hitters. As a result HR hitters tend to have more BB. Thus a team with many HR will also have more BB and as a result it may appear that BB cause Runs but it is actually the HR that cause the runs. We say that BB are _confounded_ with HR. But could it be that BB still help? To find out we somehow have to adjust for the HR effect. Regression can help with this as well.
+It turns out that pitchers, afraid of HRs, will sometimes avoid throwing strikes to HR hitters. As a result HR hitters tend to have more BBs. Thus a team with many HRs will also have more BBs and as a result it may appear that BBs cause Runs but it is actually the HRs that cause the runs. We say that BBs are _confounded_ with HR. But could it be that BBs still help? To find out we somehow have to adjust for the HR effect. Regression can help with this as well.
 
 ### Stratification 
 
-A first approach is to keep HRs fixed at a certain value and then examine the relationship. As we did when we stratified fathers by rounding to the closest inch, here we can stratify HR per game to the closest tenth (we filter out the strata with few points):
+A first approach is to keep HRs fixed at a certain value and then examine the relationship. As we did when we stratified fathers by rounding to the closest inch, here we can stratify HRs per game to the closest tenth (we filter out the strata with few points):
 
 ```{r}
 dat <- Teams %>% filter(yearID %in% 1961:2001) %>%
@@ -57,7 +57,7 @@ dat %>%
   facet_wrap(~HR_strata) 
 ```
 
-Remember that the regression slope for predicting runs with BB was `bb_slope`. Once we stratify by HR these slopes are substantially reduced:
+Remember that the regression slope for predicting runs with BB was `r signif(bb_slope, 3)`. Once we stratify by HR these slopes are substantially reduced:
 
 ```{r}
 dat %>%  
@@ -65,9 +65,9 @@ dat %>%
   summarize(slope = cor(BB_per_game, R_per_game)*sd(R_per_game)/sd(BB_per_game))
 ```
 
-These values are closer the the slope we obtained from singles `r singles_slope`, which is more consistent with our intuition since both singles and BB get us to first base, they should have about the same predictive power.
+These values are closer the the slope we obtained from singles `r signif(singles_slope, 3)`, which is more consistent with our intuition since both singles and BBs get us to first base, they should have about the same predictive power.
 
-Now, although our understanding of the application tells us that HR cause BB but not the other way around, we can still check if stratifying by BB makes the effect of BB go down. We use the same code except we swap HR and BBs to get this plot:
+Now, although our understanding of the application tells us that HRs cause BBs but not the other way around, we can still check if stratifying by BBs makes the effect of BBs go down. We use the same code except we swap HR and BB to get this plot:
 
 ```{r, echo=FALSE}
 dat <- Teams %>% filter(yearID %in% 1961:2001) %>%
@@ -90,9 +90,9 @@ dat %>% group_by(BB_strata) %>%
 ```
 
 do not change much from the original
-`r hr_splope <- Teams %>% filter(yearID %in% 1961:2001 ) %>% mutate(HR_per_game = HR/G, R_per_game = R/G) %>% lm(R_per_game ~ HR_per_game, data = .) %>% .$coef  %>% .[2]; hr_splope`.
+`r hr_slope <- Teams %>% filter(yearID %in% 1961:2001 ) %>% mutate(HR_per_game = HR/G, R_per_game = R/G) %>% lm(R_per_game ~ HR_per_game, data = .) %>% .$coef  %>% .[2]; signif(hr_slope, 3)`.
 
-Regardless, it seems that if we stratify by HR we have bivariate distributions for runs versus BB. Similarly if we stratify by BB, we have approximate bivariate normal distributions for  HR versus runs. 
+Regardless, it seems that if we stratify by HRs we have bivariate normal distributions for runs versus BBs. Similarly if we stratify by BBs, we have approximate bivariate normal distributions for HRs versus runs. 
 
 ##  Multivariate Regression
 
@@ -112,7 +112,7 @@ $$
 
 This model implies that if the number of HR is fixed at $x_2$ we observe a linear relationship between runs and BB with an intercept of $\beta_0 + \beta_2 x_2$. The model also implies that as the number of HR grows, the intercept grows is linear as well and determined by $\beta_1 x_1$. 
 
-In this analysis, referred to as _multivariate regression_ we say that the BB slope $\beta_1$ is _adjusted_ for the HR effect. If the model is correct then confounding has been accounted for. But how do we estimate $\beta_1$ and $\beta_2$ from the data? For this, we learn about linear models and least squares estimates.
+In this analysis, referred to as _multivariate regression_, we say that the BB slope $\beta_1$ is _adjusted_ for the HR effect. If the model is correct then confounding has been accounted for. But how do we estimate $\beta_1$ and $\beta_2$ from the data? For this, we learn about linear models and least squares estimates.
 
 ## Linear Models
 
@@ -120,10 +120,10 @@ Since Galton's original development, regression has become one of the most widel
 
 We have described how if data is bivariate normal then the conditional expectations follow the regression line. That the conditional expectation is a line is not an extra assumption but rather a result derived. However, in practice it is common to explicitly write down a model that describes the relationship between two or more variables using a _linear model_. 
 
-We note that "Linear" here does not refer to lines exclusively, but rather to the fact that the conditional expectation is linear combinations of known quantities. In math we call a linear combination of variables, say $x$, $y$ and $z$ and combination that multiply them by a constant and then adds then with shifts permuted, for example $2 + 3x - 4y + 5z$. So $\beta_0 + \beta_1 x_1 + \beta_2 x_2$ is a linear combination of $x_1$ and $x_2$.
+We note that "Linear" here does not refer to lines exclusively, but rather to the fact that the conditional expectation is linear combinations of known quantities. In math a linear combination is an expression of variables, say $x$, $y$ and $z$, and a combination of constant terms that multiply them and add a shift, for example $2 + 3x - 4y + 5z$. So $\beta_0 + \beta_1 x_1 + \beta_2 x_2$ is a linear combination of $x_1$ and $x_2$.
 The simplest linear model is a constant $\beta_0$, the second simplest is a line $\beta_0 + \beta_1 x$. 
 
-For Galton's data we would denote the $N$ observe red father's heights with $x_1, \dots, x_n$. Then we model the $N$ son heights we are trying to predict with 
+For Galton's data we would denote the $N$ observed father's heights with $x_1, \dots, x_n$. Then we model the $N$ son heights we are trying to predict with 
 
 $$ 
 Y_i = \beta_0 + \beta_1 x_i + \varepsilon_i, \, i=1,\dots,N 
@@ -133,9 +133,9 @@ with $x_i$ is the father's height, which is fixed (not random) due to the condit
 
 Note that if we further assume that the $\varepsilon$ is normally distributed, then this model is exactly the same one we derived earlier. A somewhat nuanced difference is that in the first approach we assumed the data was bivariate normal and the linear model was derived not assumed. In practice, linear models are just assumed without necessarily assuming normality: the distribution of the $\varepsilon$s is not specified. But, nevertheless, if your data is bivariate normal, the above linear model holds. If your data is not bivariate normal, then you will need to have other ways of justifying the model.
 
-One reason linear models are popular is that they are interpret able. In the case of Galton's data we can interpret the data like this: due to inherited genes, the son's height prediction grows by $\beta_1$ for each inch we increase the father height $x$. Because not all sons with fathers of height $x$ are of equal height, we need the term $\varepsilon$, which explains the remaining variability. This remaining variability includes the mother's genetic effect, environmental factors, and other biological randomness. 
+One reason linear models are popular is that they are interpretable. In the case of Galton's data we can interpret the data like this: due to inherited genes, the son's height prediction grows by $\beta_1$ for each inch we increase the father height $x$. Because not all sons with fathers of height $x$ are of equal height, we need the term $\varepsilon$, which explains the remaining variability. This remaining variability includes the mother's genetic effect, environmental factors, and other biological randomness. 
 
-Note that, given how we wrote the model above, the intercept $\beta_0$ is not very interpret able as it is the predicted height of a son with a father with no height. Due to regression to the mean the prediction will usually be a bit larger than 0. To make the slope parameter more interpret able we can rewrite the model slightly as
+Note that, given how we wrote the model above, the intercept $\beta_0$ is not very interpretable as it is the predicted height of a son with a father with no height. Due to regression to the mean the prediction will usually be a bit larger than 0. To make the slope parameter more interpret able we can rewrite the model slightly as
 
 $$ 
 Y_i = \beta_0 + \beta_1 (x_i - \bar{x}) + \varepsilon_i, \, i=1,\dots,N 
@@ -174,7 +174,7 @@ results %>% ggplot(aes(beta1, rss)) + geom_line() +
   geom_line(aes(beta1, rss), col=2)
 ```
 
-We can see a clear minimum for $\beta_1$ at around 0.65. However, this minimum for $\beta_1$ is for when $\beta_0=25$. But we don which we don't know if it minimizes the pair $(25, 0.65)$ minimize the equation across all pairs. 
+We can see a clear minimum for $\beta_1$ at around 0.65. However, this minimum for $\beta_1$ is for when $\beta_0=25$. But we don't know if it minimizes the equation across all pairs of ($\beta_0, \beta_1$). 
 
 Trial and error here is not going to work. Instead, we will use calculus: take the partial derivatives, set them to 0 and solve. Of course, if we have many parameters, these equations can get rather complex. But there are functions in R that do these calculations for us. We will learn these soon. To learn the mathematics behind this you can consult a book on linear models. 
 
@@ -193,7 +193,7 @@ fit <- lm(son ~ father, data = galton_heights)
 fit
 ```
 
-and obtain the lest squares estimates. The general way we use `lm` is by using the character `~` to let `lm` which is the variable we are predicting (left) and which we are using to predict (right). The intercept is added automatically to the model that will be fit. 
+and obtain the lest squares estimates. The general way we use `lm` is by using the character `~` to let `lm` know which is the variable we are predicting (left) and which we are using to predict (right). The intercept is added automatically to the model that will be fit. 
 
 The object `fit` includes more information about the fit. We can use the function `summary` to extract more of this information
 
@@ -242,7 +242,7 @@ lse %>% summarize(se_0 = sd(beta_0), se_1 = sd(beta_1))
 
 The `summary` function also reports t-statistics (`t value`) and p-values (`Pr(>|t|)`). The t-statistic is not actually based on the central limit theorem but rather on the assumption that the $\varepsilon$s follow a normal distribution. Under this assumption, mathematical theory tells is that the LSE divided by their standard error, $\hat{\beta}_0 / \hat{\mbox{SE}}(\hat{\beta}_0 )$ and $\hat{\beta}_1 / \hat{\mbox{SE}}(\hat{\beta}_1 )$ follow a t-distribution whit $N-p$ degrees of freedom with $p$ the number of parameters in our model. In the case of height $p=2$. The two p-value are testing the null hypothesis that $\beta_0 = 0$ and $\beta_1=0$ respectively.  Note that, as we described previously, for large enough $N$ the CLT works and the t-distribution becomes almost the same as the normal distribution. Also note that we can construct confidence intervals, but we will soon learn about broom, an add-on package that makes this easy.
 
-We note here that although we do not show examples in this book, hypothesis testing with regression models is very commonly used in Epidemiology and Economics to make statements such as "the effect of A on B was statistically significant after adjusting for X, Y and Z". Note that several assumptions have to hold for these statements to hold.
+We note here that although we do not show examples here, hypothesis testing with regression models is very commonly used in Epidemiology and Economics to make statements such as "the effect of A on B was statistically significant after adjusting for X, Y and Z". Note that several assumptions have to hold for these statements to hold.
 
 #### Advanced note
 
@@ -352,7 +352,7 @@ Note that there are no columns with this information. But, if you look closely a
 dat %>%  group_by(HR) %>% class()
 ```
 
-The `tbl`, pronounced tibble, or `tbl_df`, is a special kind of data frame. We have seen them before because `tidyverse` functions such as `group_by` and `summarize` always return this type of data frame. The `group_by` function returns a special kind of `tbl`, the `grouped_df`. We will say more about these  latter.
+The `tbl`, pronounced tibble, or `tbl_df`, is a special kind of data frame. We have seen them before because `tidyverse` functions such as `group_by` and `summarize` always return this type of data frame. The `group_by` function returns a special kind of `tbl`, the `grouped_df`. We will say more about these  later.
 
 The manipulation verbs,  `select`, `filter`, `mutate`, and `arrange` preserve the class of the input: if they receive a data frame they return a data frame.
 But tibbles are the default data frame in the tidyverse. 
@@ -601,7 +601,7 @@ tidy(fit, conf.int = TRUE)
 ```
 
 
-When we fit the model with only one variable the estimated slopes were `r bb_slope` and `r hr_splope`  for BB and HR respectively. Note that when fitting the multivariate model both go down, with the BB effect decreasing much more. 
+When we fit the model with only one variable the estimated slopes were `r signif(bb_slope, 3)` and `r signif(hr_slope, 3)`  for BB and HR respectively. Note that when fitting the multivariate model both go down, with the BB effect decreasing much more. 
 
 Now, if we want to construct a metric to pick players, we need to consider singles, doubles, and triples as well. Can we build a model that predicts runs based on all these outcomes? 
 
@@ -657,7 +657,7 @@ Teams %>%
 Our model does quite a good job as demonstrated by the fact that points from the observed versus predicted plot fall close to the identity line.
 
 
-So instead of using batting average or just number of HR as a measure of picking players, we can use our fitted model to form a more metric that relates more directly to run production. Specifically, to define a metric for player A, we imagine a team made up of players just like player A and use our fitted regression model to predict how many runs this team would produce. The formula would look like this: 
+So instead of using batting average or just number of HR as a measure of picking players, we can use our fitted model to form a metric that relates more directly to run production. Specifically, to define a metric for player A, we imagine a team made up of players _just like player A_ and use our fitted regression model to predict how many runs this team would produce. The formula would look like this: 
 `r coefs$estimate[1]` + 
 `r coefs$estimate[2]` $\times$ BB +
 `r coefs$estimate[3]` $\times$ singles +
@@ -760,7 +760,7 @@ players %>% filter(debut < 1998) %>%
   scale_x_log10()
 ```
 
-We can search for good deals by looking at players that produce many more runs that others with similar salaries. We can use this table to decide what players to pick and keep our total salary below the 40 million dollars Billy Bean had to work with. This can be done using what compute scientist called linear programming. This is not something we teach but we include the code anyway:
+We can search for good deals by looking at players that produce many more runs that others with similar salaries. We can use this table to decide what players to pick and keep our total salary below the 40 million dollars Billy Bean had to work with. This can be done using what computer scientists call linear programming. This is not something we teach but we include the code anyway:
 
 ```{r}
 library(reshape2)
@@ -953,7 +953,7 @@ Because the correlation is not perfect regression tells us that on average, expe
 
 ## Measurement error models
 
-Up to now, all our linear regression examples have been applied to two or more random variables. We assume the pairs are bivariate normal and used this to motivates a linear model. This approach cover most real life examples of linear regression. The other major application comes from measurement errors models. In these application, it is common to have a non-random covariate, such as time, and randomness is introduced from measurement error rather than sampling or natural variability.
+Up to now, all our linear regression examples have been applied to two or more random variables. We assume the pairs are bivariate normal and used this to motivate a linear model. This approach covers most real life examples of linear regression. The other major application comes from measurement error models. In these applications, it is common to have a non-random covariate, such as time, and randomness is introduced from measurement error rather than sampling or natural variability.
 
 To understand these models, imagine you are Galileo in the 16th century trying to describe the velocity of a falling object. An assistant climbs the Tower of Pisa and drops a ball, while several other assistants record the position at different times. Let's simulate some data using the equations we know today and adding some measurement error:
 
@@ -981,7 +981,7 @@ $$ Y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \varepsilon_i, i=1,\dots,n $$
 
 With $Y_i$ representing distance in meters, $x_i$ representing time in seconds, and $\varepsilon$ accounting for measurement error. The measurement error is assumed to be random, independent from each other, and having the same distribution for each $i$. We also assume that there is no bias which means the expected value $\mbox{E}[\varepsilon] = 0$.
 
-Note that this is a linear model because it is a linear combination of known quantities, $x$ and $x^2$ are known, and unknown parameters (the $\beta$ s). Unlike our previous examples $x$ are fixed quantities, we are not conditioning. 
+Note that this is a linear model because it is a linear combination of known quantities, $x$ and $x^2$, and unknown parameters (the $\beta$ s). Unlike our previous examples $x$ are fixed quantities, we are not conditioning. 
 
 To pose a new physical theory and start making predictions about other falling objects Galileo needs actual numbers, rather than unknown parameters. The LSE seem like a reasonable approach. How do we find the LSE?
 
