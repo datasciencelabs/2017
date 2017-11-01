@@ -52,7 +52,7 @@ res <- sim_data %>% group_by(group) %>% summarize(r = cor(X, Y)) %>% arrange(des
 res
 ```
 
-We see a correlation of `r max(res$r)` and if you just plot the data from that group it shows a convincing plot that $X$ and $Y$ are in fact correlated:
+We see a correlation of `r signif(max(res$r), 3)` and if you just plot the data from that group it shows a convincing plot that $X$ and $Y$ are in fact correlated:
 
 ```{r}
 sim_data %>% filter(group == res$group[which.max(res$r)]) %>%
@@ -67,7 +67,7 @@ Remember that the correlation summary is a random variable. Here is the distribu
 res %>% ggplot(aes(x=r)) + geom_histogram(binwidth = 0.1, color = "black")
 ```
 
-It is just a mathematical fact that if we observe `r cat(prettyNum(G,big.mark=",",scientific=FALSE))` random correlations that are expected to be 0 but have a standard error of `r sd(res$r)`, the largest one will be close 1. 
+It is just a mathematical fact that if we observe `r cat(prettyNum(G,big.mark=",",scientific=FALSE))` random correlations that are expected to be 0 but have a standard error of `r signif(sd(res$r),3)`, the largest one will be close 1. 
 
 Note that if we performed regression on this group and interpreted the p-value, we would incorrectly claim this was a statistically significant relation:
 
@@ -164,11 +164,11 @@ The model fits the data very well. If we look at the mathematical formulation of
 
 ### Confounders
 
-Confounders are perhaps the most common reason that leads to associations begin misinterpreted.  
+Confounders are perhaps the most common reason that leads to associations being misinterpreted.  
 
-If $X$ and $Y$ are correlated, we call $Z$ a _confounder_ if changes in $Z$ causes changes in both $X$ and $Y$. Earlier, when studying baseball data, we saw how Home Runs was a confounder that resulted in a higher correlation than expected when studying the relationship between Bases on Balls and Runs. In some cases, we can use linear models to account for confounders. However, this is not always the case.
+If $X$ and $Y$ are correlated, we call $Z$ a _confounder_ if changes in $Z$ cause changes in both $X$ and $Y$. Earlier, when studying baseball data, we saw how Home Runs was a confounder that resulted in a higher correlation than expected when studying the relationship between Bases on Balls and Runs. In some cases, we can use linear models to account for confounders. However, this is not always the case.
 
-Incorrect interpretation due to confounders are ubiquitous in the lay press. They are sometimes hard to detect. Here we present two examples, both related to gender discrimination.
+Incorrect interpretation due to confounders is ubiquitous in the lay press. It is sometimes hard to detect. Here we present two examples, both related to gender discrimination.
 
 ### Example: UC Berkeley admissions 
 
@@ -221,7 +221,7 @@ admissions %>%
   geom_text()
 ```
 
-There seems to be association. The plot suggests that women were much more likely to apply to the two "hard" majors: gender and major's selectivity are confounded. Compare, for example,  major B and major E. Major B is much harder to enter than major E and over 60% of applicants to major B were women while less than 30% of the applicants of major E were women. 
+There seems to be an association. The plot suggests that women were much more likely to apply to the two "hard" majors: gender and major's selectivity are confounded. Compare, for example,  major B and major E. Major E is much harder to enter than major B and over 60% of applicants to major E were women while less than 10% of the applicants of major B were women. 
 
 
 #### Confounding explained graphically
@@ -235,7 +235,7 @@ admissions %>%
   geom_bar(stat = "identity", position = "stack")
 ```
 
-It also breaks down the acceptance rates by major: the size of the colored bars represents the percent of each major students were admitted to. This breakdown allows us tp see that the majority of accepted men come from two majors: A and B. It also lets us see that few women applied to these majors. What the plot does **not** show us is what the percent admitted by major. 
+It also breaks down the acceptance rates by major: the size of the colored bars represents the percent of each major students were admitted to. This breakdown allows us to see that the majority of accepted men come from two majors: A and B. It also lets us see that few women were accepted to these majors. What the plot does **not** show us is the number of applicants for each major. 
 
 #### Average after stratifying
 
@@ -250,7 +250,7 @@ admissions %>%
 
 Now we see that major by major, there is not much difference. The size of the dot represents the number of applicants, and explains the paradox: we see large red dots and small blue dots for the easiest majors, A and B.
 
-If we average the difference by major we find that the percent ad actually 3.5% higher for women.
+If we average the difference by major we find that the percent is actually 3.5% higher for women.
 
 ```{r}
 admissions %>%  group_by(gender) %>% summarize(average = mean(admitted))
@@ -259,7 +259,7 @@ admissions %>%  group_by(gender) %>% summarize(average = mean(admitted))
 
 ### Simpson's Paradox 
 
-The case we have just covered is an example of Simpson's Paradox. It is called a paradox because we see the sign of the correlation of flip when comparing the entire publication and specific strata. The following is an illustrative example. Suppose you have three variables $X$, $Y$ and $Z$. Here is a scatterplot of $Y$ versus $X$:
+The case we have just covered is an example of Simpson's Paradox. It is called a paradox because we see the sign of the correlation of flip when comparing the entire dataset and specific strata. The following is an illustrative example. Suppose you have three variables $X$, $Y$ and $Z$. Here is a scatterplot of $Y$ versus $X$:
 
 ```{r, echo=FALSE}
 N <- 100
@@ -274,7 +274,7 @@ dat %>% ggplot(aes(X,Y)) + geom_point(alpha = .5) +
   ggtitle(paste("correlation = ", round(cor(dat$X, dat$Y), 2)))
 ```
 
-You can see that $X$ and $Y$ are negatively correlated. However, once we stratify by $Z$ (shown in different colors), which we have not yet shown, another pattern emerges. 
+You can see that $X$ and $Y$ are negatively correlated. However, once we stratify by $Z$, shown in different colors below, another pattern emerges. 
 
 ```{r, echo=FALSE}
 means <- tbl_df(Reduce(rbind, means)) %>% setNames(c("x","y")) %>%
