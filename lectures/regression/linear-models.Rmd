@@ -2,6 +2,7 @@
 
 ```{r, echo=FALSE, message=FALSE}
 set.seed(1)
+options(digits = 3)
 library(tidyverse)
 library(dslabs)
 ds_theme_set()
@@ -220,7 +221,7 @@ lse <- data.frame(beta_0 = lse[1,], beta_1 = lse[2,])
 
 We can see the variability of the estimates by plotting their distributions:
 
-```{r}
+```{r, warning=FALSE}
 library(gridExtra)
 p1 <- lse %>% ggplot(aes(beta_0)) + geom_histogram(binwidth = 5, color = "black") 
 p2 <- lse %>% ggplot(aes(beta_1)) + geom_histogram(binwidth = 0.1, color = "black") 
