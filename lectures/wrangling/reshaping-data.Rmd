@@ -20,7 +20,7 @@ The gathering code looks like this:
 
 ```{r}
 new_tidy_data <- wide_data %>%
-  gather(year, fertility, `1960`:`2015`)
+  gather(my_year, my_fertility, `1960`:`2015`) 
 ```
 
 We can see that the data have been converted to tidy format with columns `year` and `fertility`:
@@ -121,7 +121,8 @@ dat %>% separate(key, c("year", "variable_name"))
 However, we run into a problem. Note that we receive the warning `Too many values at 112 locations:` and the that `life_exepectancy` variable is truncated to `life`. This is because the `_` is used to separate `life` and `expectancy` not just year and variable name. We could add a third column to catch this and let the `separate` function know which column to _fill in_ with missing values, `NA`, when there is no third value. Here we tell it to fill the column on the right:
 
 ```{r}
-dat %>% separate(key, c("year", "first_variable_name", "second_variable_name"), 
+dat %>% separate(key, 
+                 c("year", "first_variable_name", "second_variable_name"), 
                  fill = "right")
 ```
 

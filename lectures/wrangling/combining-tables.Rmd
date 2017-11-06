@@ -38,7 +38,7 @@ The general idea is that one needs to identify one or more columns that will ser
 
 ```{r}
 tab <- left_join(murders, results_us_election_2016, by = "state")
-head(tab)
+tab %>% select(state, population, electoral_votes) %>% head()
 ```
 
 The data has been successfully joins and we can now, for example, make a plot to explore the relationship
