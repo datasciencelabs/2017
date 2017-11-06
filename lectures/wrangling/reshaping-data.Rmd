@@ -1,6 +1,6 @@
 ## Reshaping data
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
 library(tidyverse) 
 path <- system.file("extdata", package="dslabs")
 filename <- file.path(path,  "fertility-two-countries-example.csv")
@@ -41,6 +41,12 @@ new_tidy_data <- wide_data %>%
 This data looks a lot like the original `tidy_data` we used. There is just one minor difference. Can you spot it? Look at the data type of the year column:
 
 ```{r}
+library(dslabs)
+data("gapminder")
+tidy_data <- gapminder %>% 
+  filter(country %in% c("South Korea", "Germany")) %>%
+  select(country, year, fertility)
+
 class(tidy_data$year)
 class(new_tidy_data$year)
 ```
@@ -72,9 +78,7 @@ select(new_wide_data, country, `1960`:`1967`)
 ```
 
 
-The following diagram can help remind you how these two functions work
-
-[SCREEN SHOT FROM THE CHEAT SHEET]
+The diagrams in the cheat sheet can help remind you how these two functions work.
 
 
 ### `separate`

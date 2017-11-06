@@ -1,14 +1,11 @@
 ## Web Scraping 
 
-The data we need to answer a question is not always in a spreadsheet, ready for us to read. For example the US murders dataset we used in the R Basics chapter originally comes from this Wikipedia page: [https://en.wikipedia.org/wiki/Murder_in_the_United_States_by_state](https://en.wikipedia.org/wiki/Murder_in_the_United_States_by_state). You can see the data table when you visit the web page:
-
-[INCLUDE SCREEN SHOT]
+The data we need to answer a question is not always in a spreadsheet, ready for us to read. For example the US murders dataset we used in the R Basics chapter originally comes from this Wikipedia page: [https://en.wikipedia.org/wiki/Murder_in_the_United_States_by_state](https://en.wikipedia.org/wiki/Murder_in_the_United_States_by_state). You can see the data table when you visit the web page.
 
 But, unfortunately, there is no link to a data file. To make the data frame we loaded using `data(murders)`, or reading the csv file made available through `dslabs`, we had to do some _web scrapping_. 
 
 _Web scraping_, or _web harvesting_, are the terms we use to describe the process of extracting data from a website. The reason we can do this is because the information used by a browser to render web pages is received as **text** from a server. The text is computer code written in hyper text markup language (HTML). To see the code for a web page you can visit the page on your browser, then you can use the _View Source_ tool to see it.
 
-[INCLUDE SCREEN SHOT OF HOW TO CLICK TO SEE IT]
 
 Because this code is accessible, we can download the HTML files, import it into R, and then write programs to extract the information we need from the page. However, once we look at HTML code this might seem like a daunting task. But we will show you some convenient tools to facilitate the process. To get an idea of how it works, here are we show a few lines of code from the Wikipedia that provides the US murders data:
 

@@ -1,6 +1,6 @@
 ## Combining tables
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(ggrepel)
 library(dslabs)
@@ -128,9 +128,7 @@ The function `anti_join` is the opposite of `semi_join`. It keeps the elements o
 anti_join(tab1, tab2)
 ```
 
-The following diagram summarizes the above joins
-
-[INSERT IMAGE HERE]
+The cheat sheet contains a diagram that summarizes the above joins
 
 ### Binding
 
