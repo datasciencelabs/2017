@@ -1,0 +1,314 @@
+## Data import
+
+### Text versus binary files
+
+Edit this:
+
+Most people classify files in two categories: binary files and ASCII (text) files. You've actually worked with both. Any program you write (C/C++/Perl/HTML) is almost surely an ASCII file.
+An ASCII file is defined as a file that consists of ASCII characters. It's usually created by using a text editor like emacs, pico, vi, Notepad, etc. There are fancier editors out there for writing code, but they may not always save it as ASCII.
+
+As an aside, ASCII text files seem very "American-centric". After all, the 'A' in ASCII stands for American. However, the US does seem to dominate the software market, and so effectively, it's an international standard.
+
+Computer science is all about creating good abstractions. Sometimes it succeeds and sometimes it doesn't. Good abstractions are all about presenting a view of the world that the user can use. One of the most successful abstractions is the text editor.
+
+When you're writing a program, and typing in comments, it's hard to imagine that this information is not being stored as characters. Of course, if someone really said "Come on, you don't really think those characters are saved as characters, do you? Don't you know about the ASCII code?", then you'd grudgingly agree that ASCII/text files are really stored as 0's and 1's.
+
+But it's tough to think that way. ASCII files are really stored as 1's and 0's. But what does it mean to say that it's stored as 1's and 0's? Files are stored on disks, and disks have some way to represent 1's and 0's. We merely call them 1's and 0's because that's also an abstraction. Whatever way is used to store the 0's and 1's on a disk, we don't care, provided we can think of them that way.
+
+In effect, ASCII files are basically binary files, because they store binary numbers. That is, ASCII files store 0's and 1's.
+
+The Difference between ASCII and Binary Files?
+
+An ASCII file is a binary file that stores ASCII codes. Recall that an ASCII code is a 7-bit code stored in a byte. To be more specific, there are 128 different ASCII codes, which means that only 7 bits are needed to represent an ASCII character.
+However, since the minimum workable size is 1 byte, those 7 bits are the low 7 bits of any byte. The most significant bit is 0. That means, in any ASCII file, you're wasting 1/8 of the bits. In particular, the most significant bit of each byte is not being used.
+
+Although ASCII files are binary files, some people treat them as different kinds of files. I like to think of ASCII files as special kinds of binary files. They're binary files where each byte is written in ASCII code.
+
+A full, general binary file has no such restrictions. Any of the 256 bit patterns can be used in any byte of a binary file.
+
+We work with binary files all the time. Executables, object files, image files, sound files, and many file formats are binary files. What makes them binary is merely the fact that each byte of a binary file can be one of 256 bit patterns. They're not restricted to the ASCII codes.
+
+Example of ASCII files
+
+Suppose you're editing a text file with a text editor. Because you're using a text editor, you're pretty much editing an ASCII file. In this brand new file, you type in "cat". That is, the letters 'c', then 'a', then 't'. Then, you save the file and quit.
+What happens? For the time being, we won't worry about the mechanism of what it means to open a file, modify it, and close it. Instead, we're concerned with the ASCII encoding.
+
+If you look up an ASCII table, you will discover the ASCII code for 0x63, 0x61, 0x74 (the 0x merely indicates the values are in hexadecimal, instead of decimal/base 10).
+
+Here's how it looks:
+
+ASCII	'c'	'a'	't'
+Hex	63	61	74
+Binary	0110   0011	0110   0001	0111   1000
+Each time you type in an ASCII character and save it, an entire byte is written which corresponds to that character. This includes punctuations, spaces, and so forth. I recall one time a student has used 100 asterisks in his comments, and these asterisks appeared everywhere. Each asterisk used up one byte on the file. We saved thousands of bytes from his files by removing comments, mostly the asterisks, which made the file look nice, but didn't add to the clarity.
+
+Thus, when you type a 'c', it's being saved as 0110 0011 to a file.
+
+Now sometimes a text editor throws in characters you may not expect. For example, some editors "insist" that each line end with a newline character.
+
+What does that mean? I was once asked by a student, what happens if the end of line does not have a newline character. This student thought that files were saved as two-dimensions (whether the student realized ir or not). He didn't know that it was saved as a one dimensional array. He didn't realize that the newline character defines the end of line. Without that newline character, you haven't reached the end of line.
+
+The only place a file can be missing a newline at the end of the line is the very last line. Some editors allow the very last line to end in something besides a newline character. Some editors add a newline at the end of every file.
+
+Unfortunately, even the newline character is not that universally standard. It's common to use newline characters on UNIX files, but in Windows, it's common to use two characters to end each line (carriage return, newline, which is \r and \n, I believe). Why two characters when only one is necessary?
+
+This dates back to printers. In the old days, the time it took for a printer to return back to the beginning of a line was equal to the time it took to type two characters. So, two characters were placed in the file to give the printer time to move the printer ball back to the beginning of the line.
+
+This fact isn't all that important. It's mostly trivia. The reason I bring it up is just in case you've wondered why transferring files to UNIX from Windows sometimes generates funny characters.
+
+Editing Binary Files
+
+Now that you know that each character typed in an ASCII file corresponds to one byte in a file, you might understand why it's difficult to edit a binary file.
+If you want to edit a binary file, you really would like to edit individual bits. For example, suppose you want to write the binary pattern 1100 0011. How would you do this?
+
+You might be naive, and type in the following in a file:
+
+ 11000011
+But you should know, by now, that this is not editing individual bits of a file. If you type in '1' and '0', you are really entering in 0x49 and 0x48. That is, you're entering in 0100 1001 and 0100 1000 into the files. You're actually (indirectly) typing 8 bits at a time.
+"But, how am I suppose to edit binary files?", you exclaim! Sometimes I see this dilemma. Students are told to perform a task. They try to do the task, and even though their solution makes no sense at all, they still do it. If asked to think about whether this solution really works, they might eventually reason that it's wrong, but then they'd ask "But how do I edit a binary file? How do I edit the individual bits?"
+
+The answer is not simple. There are some programs that allow you type in 49, and it translates this to a single byte, 0100 1001, instead of the ASCII code for '4' and '9'. You can call these programs hex editors. Unfortunately, these may not be so readily available. It's not too hard to write a program that reads in an ASCII file that looks like hex pairs, but then converts it to a true binary file with the corresponding bit patterns.
+
+That is, it takes a file that looks like:
+
+ 63 a0 de
+and converts this ASCII file to a binary file that begins 0110 0011 (which is 63 in binary). Notice that this file is ASCII, which means what's really stored is the ASCII code for '6', '3', ' ' (space), 'a', '0', and so forth. A program can read this ASCII file then generate the appropriate binary code and write that to a file.
+
+Thus, the ASCII file might contain 8 bytes (6 for the characters, 2 for the spaces), and the output binary file would contain 3 bytes, one byte per hex pair.
+
+Viewing Binary Files
+
+Most operating systems come with some program that allows you to view a file in "binary" format. However, reading 0's and 1's can be cumbersome, so they usually translate to hexadecimal. There are programs called hexdump which come with the Linux distribution or xxd.
+While most people prefer to view files through a text editor, you can only conveniently view ASCII files this way. Most text editors will let you look at a binary file (such as an executable), but insert in things that look like ^@ to indicate control characters.
+
+A good hexdump will attempt to translate the hex pairs to printable ASCII if it can. This is interesting because you discover that in, say, executables, many parts of the file are still written in ASCII. So this is a very useful feature to have.
+
+Writing Binary Files, Part 2
+
+Why do people use binary files anyway? One reason is compactness. For example, suppose you wanted to write the number 100000. If you type it in ASCII, this would take 6 characters (which is 6 bytes). However, if you represent it as unsigned binary, you can write it out using 4 bytes.
+ASCII is convenient, because it tends to be human-readable, but it can use up a lot of space. You can represent information more compactly by using binary files.
+
+For example, one thing you can do is to save an object to a file. This is a kind of serialization. To dump it to a file, you use a write() method. Usually, you pass in a pointer to the object and the number of bytes used to represent the object (use the sizeof operator to determine this) to the write() method. The method then dumps out the bytes as it appears in memory into a file.
+
+You can then recover the information from the file and place it into the object by using a corresponding read() method which typically takes a pointer to an object (and it should point to an object that has memory allocated, whether it be statically or dynamically allocated) and the number of bytes for the object, and copies the bytes from the file into the object.
+
+Of course, you must be careful. If you use two different compilers, or transfer the file from one kind of machine to another, this process may not work. In particular, the object may be laid out differently. This can be as simple as endianness, or there may be issues with padding.
+
+This way of saving objects to a file is nice and simple, but it may not be all that portable. Furthermore, it does the equivalent of a shallow copy. If your object contains pointers, it will write out the addresses to the file. Those addresses are likely to be totally meaningless. Addresses may make sense at the time a program is running, but if you quit and restart, those addresses may change.
+
+This is why some people invent their own format for storing objects: to increase portability.
+
+But if you know you aren't storing objects that contain pointers, and you are reading the file in on the same kind of computer system you wrote it on, and you're using the same compiler, it should work.
+
+This is one reason people sometimes prefer to write out ints, chars, etc. instead of entire objects. They tend to be somewhat more portable.
+
+Summary
+
+An ASCII file is a binary file that consists of ASCII characters. ASCII characters are 7-bit encodings stored in a byte. Thus, each byte of an ASCII file has its most significant bit set to 0. Think of an ASCII file as a special kind of binary file.
+A generic binary file uses all 8-bits. Each byte of a binary file can have the full 256 bitstring patterns (as opposed to an ASCII file which only has 128 bitstring patterns).
+
+There may be a time where Unicode text files becomes more prevalent. But for now, ASCII files are the standard format for text files.
+
+### Importing Spreadsheets
+
+```{r, message=FALSE}
+library(tidyverse)
+```
+
+In the R chapter we covered some of the basics of data import. We described functions available in the default R installation. Here we present a more general discussion and introduce the `tidyverse` packages `readr` and `readxl`.
+
+Currently, one of the most commons ways of storing and sharing data for analysis is through electronic spreadsheets. A spreadsheet stores data in rows and columns. It is basically a file version of a data frame. When saving such a table to a computer file one needs a way to define when a new row or column ends and the other begins. This in turn defines the cells in which single values are stored. 
+
+When creating spreadsheets with text files like the ones you can create with a simple text editor a new row is defined with return and columns with some predefined special character. The most common characters are comma (`,`), semicolon (`;`), white space (\  ) and tab (\ \ \ \ ). Here is an example of what a comma separated file looks like if we open it with a basic text editor:
+
+[SCREEN SHOT of CSV open with text editor]
+
+You will also note that the first row contains column names rather than data. We call this a _header_ and when read-in data from a spreadsheet it is important to know if the file has a header or not. Most reading functions assume there is a header. To know if the file has a header, it helps to look at the file before trying to read it. This can be done with a text editor or with RStudio. In RStudio we can do this by navigating to the file location, double clicking on the file and hitting _View File_.
+
+However, not all spreadsheets file are text files. Google Sheets, which are rendered on a browser, are an example. Another example is the proprietary format used by Microsoft Excel. These can't be viewed with a text editor. Given the widespread use of Microsoft Excel software, this format is widely used. Although there are R packages designed to read this format, if you are choosing a file format to save your own data, you generally want to avoid Microsoft Excel. We recommend Google Sheets as a free software tool for organizing data.  We provide more recommendations in the section Data Organization with Spreadsheets.
+
+### Paths and the Working Directory
+
+We start by demonstrating how to read in a file that is already saved on your computer. There are several ways to do this and we will discuss three of them. But you only need to learn one to follow along.
+
+The first step is to find the file containing your data and know its location on your file system.
+
+When you are working in R it is important to know your _working directory_. This is the directory in which R will save or look for files by default. You can see your working directory by typing:
+
+```{r, eval=FALSE}
+getwd()
+```
+
+You can change your working directory using the function `setwd`. If you are using RStudio, you can change it by clicking on _Session_.
+
+ADD SCREEN SHOT
+
+One thing that file-reading functions have in common is that, unless a full path is provided, they search for files in the working directory. 
+For this reason, our recommended approach for beginners is that you create a directory for each analysis and keep the raw data files in that directory. To keep raw data files organized, we recommend creating a `data` directory especially when the project involves more than one data file.
+
+Because you may not have a data file handy yet, we provide example data files in the `dslabs` package. Once you download and install the `dslabs` package files will be in the external data ('extdata`) directory:
+
+```{r}
+system.file("extdata", package="dslabs")
+```
+
+Note that the output of this function call will change depending on your operating system, how you installed R and the version of R. But it will be consistent within your system and you will be able to see the files included in this directory using the function `list.files`:
+
+```{r}
+path <- system.file("extdata", package="dslabs")
+list.files(path)
+```
+
+Now that we know the location of these files, we are ready to import them into R. To make the code simpler and following along easier you can move this file to your working directory. You can do this through the file system directly, but you can also do it within R itself using the `file.copy` function. To do this it will help to define a variable with the full path using the function `file.path`. Using `paste` is not recommended since Microsoft Windows and Macs/Linux/Unix use different slashes for the paths. The function `file.path` is aware of your system and chose the correct slashes. Here is an example:
+
+```{r}
+filename <- "murders.csv"
+fullpath <- file.path(path, filename)
+fullpath
+```
+
+You can now copy the file over to the working directory like this:
+
+```{r}
+file.copy(fullpath, getwd())
+```
+
+You can check if the file is now in your working directory using the `file.exists` function:
+
+```{r}
+file.exists(filename)
+```
+
+### The `readr` and `readxl` packages
+
+Now we are ready to read in the file. `readr` is the `tidyverse` library that includes function for reading data stored in text file spreadsheets into R. The following functions are available to read-in spreadsheets:
+
+| Function | Format | Typical suffix |
+|----------|--------|---| 
+| read_table | white space separated values | txt |
+| read_csv | comma separated values|  csv |
+| read_csv2 | semicolon separated values | csv |
+| read_tsv | tab delimited separated values | tsv |
+| read_delim | general text file format, must define delimiter | txt |
+
+The `readxl` package provides functions to read in read in Microsoft Excel formats:
+
+| Function | Format | Typical suffix |
+|----------|--------|---| 
+| read_excel | auto detect the format | xls, xlsx|
+| read_xls | original format |  xls |
+| read_xlsx | new format | xlsx |
+| ---- | ----| 
+
+Note that the Microsoft Excel formats permits you to have more than one spreadsheet in one file. These are referred to as _sheets_. The functions above read the first sheet by default but the `excel_sheets` function gives us the names of the sheets in an excel file. These names can then be passed to the `sheet` argument in the three functions above to read sheets other than the first.
+
+Note that the suffix usually tells us what type of file it is, but there is no guarantee that these always match. We can open the file to take a look or use function `read_lines` can be used to look at a few lines:
+
+```{r}
+read_lines("murders.csv", n_max = 3)
+```
+
+This also shows that there is a header. Now we are ready to read in the data into R. From the suffix and the peek at the file we know to use `read_csv`:
+
+```{r}
+dat <- read_csv(filename)
+```
+
+we can also use the full path for the file:
+
+```{r, eval=FALSE}
+dat <- read_csv(fullpath)
+```
+
+Note that we receive a message letting us know what data types were used for each column. Also note that`dat` is a `tibble` with the content in the file:
+
+```{r}
+head(dat)
+```
+
+### R-base functions
+
+R-base also provides import functions. These have similar names to those in the `tidyverse`: `read.table`, `read.csv` and `read.delim` for example. There are a couple of important differences. To show this we read the data with an R-base function:
+
+```{r}
+dat2 <- read.csv(filename)
+```
+
+One difference is that now we have a data frame not a tibble:
+
+```{r}
+class(dat2)
+```
+
+The other difference is that the characters are converted to factors:
+
+```{r}
+class(dat2$abb)
+class(dat2$region)
+```
+
+This can be avoided by setting the argument `stringsAsFactors` to FALSE.
+
+### Downloading files
+
+Another common place for data to reside is on the internet. When these are data files we can download them and the import them or even read them directly from the web. For example, we note that because our `dslabs` package is on GitHub the file we downloaded with the package has a url
+
+```{r}
+url <- "https://raw.githubusercontent.com/rafalab/dslabs/master/inst/extdata/murders.csv"
+```
+
+The `read_csv` file can read these files directly:
+
+```{r}
+dat <- read_csv(url)
+```
+
+If you want to have a local copy of the file, you can use the `download.file`. 
+
+```{r, eval=TRUE}
+download.file(url, "murders.csv")
+```
+
+Two functions that is sometimes useful when downloading data from the internet is `tempdir` and `tempfile`. The first actually creates a directory with a name that is very unlikely not to be unique. Similarly `tempfile` creates a character string, not a file, that is likely to be a unique filename:
+
+```{r}
+tempfile()
+```
+
+So you can run a commands like this which erases the temporary file once it imports the data:
+
+```{r, eval=FALSE}
+tmp_filename <- tempfile()
+download.file(url, tmp_filename)
+dat <- read_csv(tmp_filename)
+file.remove(tmp_filename)
+head(dat)
+```
+
+
+### Nueances
+
+When reading in spreadsheets many things can go wrong. The file might have a multiline header, be missing cells or it might use an unexpected [enconding]( https://en.wikipedia.org/wiki/Character_encoding). We recommend you read this [post](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/). 
+
+With experience you will learn how to deal with different challenges. Carefully reading the help files for the functions discussed here will help. Two other functions that are helpful are `scan` and `readLines`. With scan you can read in each cell of a file. Here is an example:
+
+```{r}
+x <- scan(filename, sep=",", what = "c")
+x[1:10]
+```
+
+
+#### Removing a file
+
+Now that we are done with the example we will remove the example spreadsheet we copied over to our working directory using the function `file.remove`.
+
+```{r}
+file.remove(filename)
+```
+
+
+
+
+
+
+
