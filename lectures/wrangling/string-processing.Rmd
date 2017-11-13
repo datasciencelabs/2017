@@ -111,7 +111,7 @@ cat(s)
 
 Escaping character is something we often have to use when processing strings.
 
-### The `strigr` package
+### The `stringr` package
 
 In general, string processing involves a string and a pattern. In R we usually store strings in a character vector such as `murders$population`. Above we scrapped the web to obtain the `murders_raw` data. The first three string in this vector defined by the population variable are:
 
@@ -130,7 +130,7 @@ This is because of the commas `,`. The string processing we want to do here is r
 In general string processing tasks can be divided into **detecting**, **locating**, **extracting** or **replacing** patterns in strings. 
 In our example we need to **locate** the `,` and **replace** them with an empty characters `""`. 
 
-Base R includes functions to perform all these tasks. However, they don't follow a unifying convention which makes it a bit hard to memorize and use. The `stringr` package basically repackages this functionality but using a more consistent approach of naming functions and ordering their arguments. For example, in `strigr`, all the string processing functions start with `str_` which means that if you type this and hit tab, R will auto-complete and show you all the available functions, which means we don't necessarily have to memorize all the function names. Another advantage is that the string is always the first argument, which means we can more easily use the pipe. So we will be focusing on the `stringr` package. However, because the R-base equivalents are so widely used, below we include a table describing the `strigr` functions and include R-base equivalent when available.
+Base R includes functions to perform all these tasks. However, they don't follow a unifying convention which makes it a bit hard to memorize and use. The `stringr` package basically repackages this functionality but using a more consistent approach of naming functions and ordering their arguments. For example, in `stringr`, all the string processing functions start with `str_` which means that if you type this and hit tab, R will auto-complete and show you all the available functions, which means we don't necessarily have to memorize all the function names. Another advantage is that the string is always the first argument, which means we can more easily use the pipe. So we will be focusing on the `stringr` package. However, because the R-base equivalents are so widely used, below we include a table describing the `stringr` functions and include R-base equivalent when available.
 
 #### The `str_` functions
 
@@ -138,7 +138,7 @@ Base R includes functions to perform all these tasks. However, they don't follow
 library(stringr)
 ```
 
-The table below includes the functions available to you in the `strigr` package. We split them by task. We also include the R-base equivalent when available. 
+The table below includes the functions available to you in the `stringr` package. We split them by task. We also include the R-base equivalent when available. 
 
 All these functions take a character vector as first argument. Also, for each function, operations are vectorized: the operation gets applied to each string in the vector. 
 
