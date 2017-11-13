@@ -1,0 +1,25 @@
+#### Assessment
+
+1. For each of the following determine if the outcome is continuos or categorical
+
+a. Digit reader
+b. Movie recommendations
+c. Spam filter
+d. Hospitalizations
+e. Siri
+
+
+2. How many features are availalbe to us for prediction in the digits dataset?
+
+
+3. Create a predictor by rounding the heights to the nearest inch. What is the conditional probability of being Male if you are 70 inches tall?
+
+
+4. Define the following predictor
+
+```{r}
+X = round(heights$height)
+```
+
+Estimate $f(x) = \mbox{Pr}( y = 1 | X=x)$ for each $x$ and plot it against $x$.
+

@@ -1,0 +1,681 @@
+# (PART) Machine Learning {-}
+
+```{r, echo=FALSE, message=FALSE}
+options(digits=3)
+library(tidyverse)
+library(dslabs)
+ds_theme_set()
+```
+
+# Introduction
+
+Perhaps the most popular data science methodologies come from _Machine Learning_. Machine learning success stories include the hand writing zip code readers implemented by the postal service, speech recognition such as Apple's Siri, movie recommendation systems, spam and malware detectors, housing prices, stock market outcomes,and driver-less cars. While artificial intelligence algorithms, such as those used by chess playing machines, 
+implement decision making based on programmable rules derived from theory or first principles, in Machine Learning decisions are based on algorithms built on data. 
+
+
+## Notation
+
+Data comes in the form of
+
+1. the _outcome_ we want to predict and 
+2. the _features_ that we will use to predict the outcome.
+
+We want to build an algorithm that takes feature values as input and returns a prediction for the outcome when we don't know it. The machine learning approach is to use a dataset for which we do know the outcome to _train_ the algorithm for future use.
+
+Here we will use $Y$ to denote the outcome and $X_1, \dots, X_p$ to denote features. Features are sometimes referred to as predictors or covariates.
+
+
+Prediction problems can be divided into categorical and continuous outcomes. For categorical outcomes, such as the digit $Y$ can be one of $K$ classes. The number of classes can very greatly across applications.
+For examples, in the digit data, the outcome $K=10$ with the classes being the digits 0, 1, 2, 3, 4, 5, 6, 7, 8, and 9. In speech recognition, the outcome are all possible words we are trying to detect. Spam detection has two outcomes: spam or not spam. Here we denote the $K$ categories with indexes $k=1,\dots,K$. However, for binary data we will use $k=0,1$. 
+
+The general set-up is as follows. We have a series of features and an unknown outcome we want to predict:
+
+```{r,echo=FALSE}
+n <- 1
+tmp <- data.frame(outcome=rep("?",n), 
+                  feature_1 = paste0("X_1"),
+                  feature_2 = paste0("X_2"),
+                  feature_3 = paste0("X_3"),
+                  feature_4 = paste0("X_4"),
+                  feature_5 = paste0("X_5"))
+tmp %>% knitr::kable(align="c")
+```
+
+To _build a model_, that provides a prediction for any set of values $X_1=x_1, X_2=x_2, \dots X_5=x_5$, we collect data for which we know the outcome 
+
+```{r, echo=FALSE}
+n <- 10
+tmp <- data.frame(outcome = paste0("Y_", 1:n), 
+                  feature_1 = paste0("X_",1:n,",1"),
+                  feature_2 = paste0("X_",1:n,",2"),
+                  feature_3 = paste0("X_",1:n,",3"),
+                  feature_4 = paste0("X_",1:n,",4"),
+                  feature_5 = paste0("X_",1:n,",5"))
+tmp %>% knitr::kable()
+```
+
+We use the notation $\hat{Y}$ to denote the prediction. We use the term _actual otucome_ to denote what we ended up observing. So we want the prediction $\hat{Y}$ to match the _actual outcome_. 
+
+## Categorical versus Continuous
+
+The outcome $Y$ can be categorical (which digit, what word, spam or not spam, pedestrian or empty road ahead) or continuous (movie ratings, housing prices, stock value, distance to pedestrian). The concepts and algorithms we learn here apply to both. However, there are some differences in how we approach each case so it is important to distinguish between the two. 
+
+When the outcome is categorical we refer to the task as _classification_. Our predictions will be categorical just like our outcomes and they will be either correct or incorrect. When the outcome is continuous we will refer to the task as _prediction_. 
+In this case our predictions will not be either right or wrong but some distance away from the actual outcome. This term can be confusing since we call $\hat{Y}$ our prediction as even when it is a categorical outcome. However, throughout the lecture, the context will make the meaning clear. 
+
+Note that these terms  vary among course, text books, and other publications. Often _prediction_ is used for both categorical and continuous and _regression_ is used for the continuous case. Here we avoid using _regression_ to avoid confusion with our previous use of the term _linear regression_. In most cases it will be clear if our outcomes are categorical or continuous so we will avoid using these terms when possible.
+
+The first part of this part deals with categorical values and the second with continuous ones.
+
+
+# Case Study 1: Digit reader 
+
+Let's consider an example. The first thing that happens to a letter when they are received in the post office is that they are sorted by zip code:
+
+```{r, echo=FALSE}
+knitr::include_graphics("http://appicationletter.com/wp-content/uploads/2017/09/finishedenvelope-x69070.jpg")
+```
+
+Originally humans had to sort these by hand. To do this they had to read the zip codes on each letter. Today thanks to machine learning algorithms, a computer can read zip codes and then a robot sorts the letters. In this chapter we will learn how to build algorithms that can read a digit.
+
+The first step in building an algorithm is to understand 
+what are the outcomes and features? Below are three images of written digits. These have already been read by a human and assigned an outcome $y$. These are considered known and serve as the training set. 
+
+```{r, echo=FALSE, cache=TRUE}
+url <- "https://raw.githubusercontent.com/datasciencelabs/data/master/hand-written-digits-train.csv"
+digits <- read_csv(url)
+tmp <- lapply( c(1,4,5), function(i){
+    expand.grid(Row=1:28, Column=1:28) %>%  
+      mutate(id=i, label=digits$label[i],  
+             value = unlist(digits[i,-1])) 
+})
+tmp <- Reduce(rbind, tmp)
+tmp %>% ggplot(aes(Row, Column, fill=value)) + 
+    geom_raster() + 
+    scale_y_reverse() +
+    scale_fill_gradient(low="white", high="black") +
+    facet_grid(.~label)
+```
+
+The images are converted into $28 \times 28 = 784$ pixels and for each pixel we obtain a grey scale intensity between 0 (white) to 255 (black) which we consider continuous for now. We can see these values like this:
+
+```{r, echo=FALSE}
+tmp %>% ggplot(aes(Row, Column, fill=value)) + 
+    geom_point(pch=21,cex=2) + 
+    scale_y_reverse() +
+    scale_fill_gradient(low="white", high="black") +
+    facet_grid(.~label)
+```
+
+For each digit $i$ we have a categorical outcome $Y_i$ which can be one of 10 values: $0,1,2,3,4,5,6,7,8,9$ and features $X_{i,1}, \dots, X_{i,784}$. We use bold face $\mathbf{X}_i = (X_{i,1}, \dots, X_{i,784})$ to distinguish the vector from the individual predictors. When referring to an arbitrary set of feature we drop the index $i$ and use $Y$ and $\mathbf{X} = (X_{1}, \dots, X_{784})$. We use upper case variable because, in general, we think of the predictors as random variables. We use lower case, for example $\mathbf{X} = \mathbf{x}$, to denote observed values. 
+
+The machine learning tasks is to build an algorithm that returns a prediction for any of the possible values of the features. Here we will learn several approaches to building these algorithms.
+Although at this point it might seem impossible to achieve this, we will start with a simpler examples, and build up our knowledge until we can attack this more complex example.
+
+# Accuracy and the confusion matrix  
+
+Here we consider a prediction task based on the height data. 
+
+```{r}
+library(dslabs)
+data(height)
+```
+
+We want to predict sex based on height. It is not a realistic example but rather one we use as an illustration that will help us start understand the main concepts. We start by defining the outcome and predictor. In this example we have only one predictor.
+
+```{r}
+y <- heights$sex
+x <- heights$height
+```
+
+This is clearly a categorical outcome since $Y$ can be `Male` or `Female`.
+Erecting $Y$ based on $X$ will be a hard task because male and female heights are not that different relative to within group variability. But we can do better than guessing?
+
+```{r}
+set.seed(1)
+N <- length(y)
+y_hat <- sample(c("Male", "Female"), N, replace = TRUE)
+```
+
+First, we will quantify what it means to do better. The confusion matrix breaks down the correct and incorrect classifications:
+
+```{r}
+table(predicted = y_hat, actual = y)
+```
+
+The _accuacy_ is simply defined as the overall proportion that is predicted correctly:
+
+```{r}
+mean(y_hat == y)
+```
+
+Not surprisingly by guessing, our accuracy is 50%. No matter the actual sex, we guess female half the time. Can we do better? We know males are slightly taller, 
+
+```{r}
+heights %>% group_by(sex) %>% summarize(mean(height), sd(height))
+```
+
+so let's try to use our covariate. Let's try the approach: predict `Male` if height is within a two standard deviations from the average male:
+
+```{r}
+y_hat <- ifelse(x > 62, "Male", "Female")
+```
+
+The accuracy goes way up from 0.50 now:
+
+```{r}
+mean(y == y_hat)
+```
+
+But can we do better? We can examine the accuracy obtained for other cutoffs and examine and then pick the value that provides the best results. However, if this optimization feels a bit like cheating to you, you are correct. By assessing our approach on the same dataset that we use to optimize our algorithm, we will end up with an over-optimistic view of our algorithm. In a later section we cover this issue, referred to as _overtraining_ in more detail.
+
+# Training and test sets
+
+The general solution to this problem is to split the data into training and testing sets. We build the algorithm using the training data and test the algorithm on the test set. In a later section we will learn more systematic ways to do this, but here we will split the data in half.
+
+We now introduce the `caret` package that has several useful functions for building and assessing machine learning methods. For example the `createDataPartition` automatically generates indexes. The argument `times` is used to define how many random samples of indexes to return, the argument `p` is used to define what proportion of the index represent, and the argument `list` is used to decide if we want the indexes returned as a list or not.
+
+
+```{r}
+library(caret)
+set.seed(1)
+train_index <- createDataPartition(y, times = 1, p = 0.5, list = FALSE)
+```
+
+We can use this index to define the training and test sets:
+
+```{r}
+train_set <- heights[train_index, ]
+test_set <- heights[-train_index, ]
+```
+
+Now let's use the train set to examine the accuracy of 11 different cutoffs:
+
+```{r}
+cutoff <- seq(60, 70)
+accuracy <- map_dbl(cutoff, function(x){
+  y_hat <- ifelse(train_set$height > x, "Male", "Female")
+  mean(y_hat == train_set$sex)
+})
+```
+
+We can make a plot showing the accuracy for males and females.
+
+```{r accuracy-v-cutoff, echo=FALSE}
+data.frame(cutoff, accuracy) %>% 
+  ggplot(aes(cutoff, accuracy)) + 
+  geom_point() + 
+  geom_line() 
+```
+
+We see that the maximum value is:
+
+```{r}
+max(accuracy)
+```
+
+much higher than 0.5, and it is maximized when with the cutoff:
+
+```{r}
+best_cutoff <- cutoff[which.max(accuracy)]
+best_cutoff
+```
+
+Now we can now test this cutoff on our test set to make sure we our accuracy is not overly optimistic:
+
+```{r}
+y_hat <- ifelse(test_set$height > best_cutoff, "Male", "Female")
+mean(y_hat == test_set$sex)
+```
+
+We see that it is a bit lower than the accuracy observed for the training set, but it is still better than guessing. And by testing on a dataset that we did no train on, we know we did not cheat.
+
+# Prevalence, Sensitivity and Specificity
+
+The prediction rule we developed in the previous section was to predict `Male` if the student's is taller than 64 inches. Given that the average female is about 65 this prediction rule. If a student is the height of the average female, shouldn't we predict `Female`? A closer look at the confusion matrix reveals the problem. We look at the proportion of calls for each sex:
+
+```{r}
+test_set %>% 
+  mutate(y_hat = y_hat) %>%
+  group_by(sex) %>% 
+  summarize(accuracy = mean(y_hat == sex))
+```
+
+There is an imbalance in the accuracy for males and females: too many females are predicted to be male. The reason this does not affect our overall accuracy is because the _prevalance_ of males in this dataset is high:
+
+```{r}
+prev <- mean(y == "Male")
+prev
+```
+
+So the high percentage of mistakes made for females is outweighed by the gains in correct calls for men. This can be a big probe in machine learning. If your training data is biased in some way, you are likely to develop algorithms that are biased as well. This is one of the reasons we look at metrics other than overall accuracy when evaluating a machine learning algorithm.
+
+
+To evaluate an algorithm in way that prevalence does not cloud our assessment,
+we can study _sensitivity_ and _specificity_ separately. These terms are defined for a specific category. In general, _sensitivity_ for category $Y=1$, is defined as the ability of an algorithm to predict $\hat{Y}=1$ whenever the outcome is a $Y=1$. Because an algorithm that calls everything a 1 always has perfect sensitivity, we can't judge them just based on sensitivity. For this reason we also examine _specificity_, which is generally defined as the ability to only call a $\hat{Y}=1$ when the case is actually $Y=1$. One way to look at it is 
+
+** High sensitivity: $Y=1 \implies \hat{Y}=1$
+** High specificity: $\hat{Y} = 1 \implies Y=1$ or equivalently $Y=0 \implies \hat{Y}=0$
+
+In a binary outcome such as this, the elements of the confusion matrix are given names. We refer to the category we are trying to predict as _positives_. In our case females are positives and males are negatives. But this is an arbitrary choice and we can use the reverse as well. Once positives are defined we can define the following terms:
+
+```{r, echo=FALSE}
+mat <- matrix(c("True positive (TP)", "False negative (FN)", 
+                "False positives (FP)", "True negatives (TN)"), 2, 2)
+colnames(mat) <- c("Positive", "Negative")
+rownames(mat) <- c("Predicted positve", "Predicted negative")
+as.data.frame(mat) %>% knitr::kable()
+```
+
+We quantify sensitivity as the proportion of positives `TP+FN` that are called positives `TP`. This is also called the true positive rate (TPR) or _recall_. Specificity can be defined as the proportion of negatives `TN+FP` that are called negatives `TN`. This is also called the true negative rate. Alternatively we can use _precision_ which is defined as the proportion of those called positives that are actually positives: `TP/(TP+FP)`.
+
+The caret function `confusionMatrix` computes all these metrics for us once we define what a positive is. The function expects factors as input and coerces characters into factors. The first level is considered the positives. Here `Female` is the first level because it comes before `Male` alphabetically.
+
+
+```{r}
+confusionMatrix(data = y_hat, reference = test_set$sex)
+```
+
+
+We can see that the high accuracy despite low sensitivity is in part due to a low prevalence and very high specificity. 
+
+For this reason we tend to prefer metrics other than accuracy. For example _balanced accuracy_ is the average of specificity and sensitivity. 
+
+However, depending on the context, some type of errors are more costly than others. For example, in the case of plane safety it is much more important to maximize sensitivity over specificity: failing to predicting a plane will malfunction before it crashes is a much more costly error than grounding a plane when in fact the plane is in perfect condition. In the case of some medical procedures the opposite may be true, for example in a criminal case in which a false positive can lead to convicting an innocent person. 
+
+The F$_{\beta}$-score is a one number summary that permits a weighted summary of sensitivity and specificity. For a given weight $\beta$, it is defined as 
+
+$$
+\frac{(1+\beta^2) \times \mbox{TP}}
+{(1+\beta^2) \times \mbox{TP} + \beta^2 \times \mbox{FP}}
+$$
+
+The most commonly used value of $\beta$ is 1 in which case the above is equivalent to 
+
+$$
+\frac{2\times \mbox{precision}\times \mbox{recall}}
+{\mbox{precision} + \mbox{recall}}
+$$
+
+We can reassess our algorithm above using the F-score instead
+
+```{r}
+cutoff <- seq(60, 70)
+F_1 <- map_dbl(cutoff, function(x){
+  y_hat <- ifelse(train_set$height > x, "Male", "Female")
+  F_meas(data = factor(y_hat), reference = factor(train_set$sex))
+})
+```
+
+As before, we can plot these values:
+
+```{r, echo=FALSE}
+data.frame(cutoff, F_1) %>% 
+  ggplot(aes(cutoff, F_1)) + 
+  geom_point() + 
+  geom_line() 
+```
+
+We see that it is maximized at:
+
+```{r}
+max(F_1)
+```
+
+when we use cutoff:
+```{r}
+best_cutoff <- cutoff[which.max(F_1)]
+best_cutoff
+```
+
+A cutoff of 66 makes much more sense than 64. Furthermore, it balances the specificity an sensitivity of our confusion matrix:
+
+```{r}
+y_hat <- ifelse(test_set$height > best_cutoff, "Male", "Female")
+confusionMatrix(data = y_hat, reference = test_set$sex)
+```
+
+# Conditional probabilities and expectations
+
+
+For categorical data, the machine learning challenge can be thought of as trying to estimate the probability of $Y$ being any of the $K$ possible  given a set of predictors $X=(X_1,\dots,X_p)$. We can quantify this by saying that we are interested in the _conditional probabilities_: 
+
+$$
+p_k(x) = \mbox{Pr}(Y=k \mid X=x), \, k=1,\dots,K
+$$
+
+If we know $p_k(x)$ then we can optimize our predictions by simply predicting the $k$ with the largest probability: 
+
+$$\hat{Y} = \max_k p_k(x)$$
+
+However, it is important to know that maximizing the probability is not always optimal in practice. As described above, depending on the context, some type of errors are more costly than others. But even in these cases knowing $p_k(x)$ will suffice for all to build optimal prediction models, since we can control these probabilities however we wish. For example, we can simply change the cutoffs used to predict one outcome or the other. In the plane example, we may ground the plane anytime the probability of malfunction is higher than 1/1000 as opposed to the default 1/2 used when error types are equally undesired. 
+
+To simplify the exposition below, let's consider the predicting sex example which is binary data case. 
+
+For binary data, you can think of the probability $\mbox{Pr}(Y=1 \mid \mathbf{X}=\mathbf{x})$ as the proportion of 1s in the stratum of the population for which $\mathbf{X}=\mathbf{x}$. 
+
+
+Many of the algorithms we will learn can be applied to both categorical and continuous data due to the connection between _conditional probabilities_ and _conditional expectations_. 
+
+Because the expectation is the average of $Y$ values, in the case in which $Y$ is 0 o the expectation is equivalent to the probability since the average is simply the proportion of ones: 
+
+$$f(x) \equiv \mbox{E}(Y \mid \mathbf{X}=\mathbf{x})=\mbox{Pr}(Y=1 \mid \mathbf{X}=\mathbf{x})$$. 
+
+We therefore use only the expectation in the descriptions below as it is more general.
+
+## Conditional expectation minimizes average distance
+
+In general, the expected value has an attractive mathematical property: it minimized the expected distance between the predictor $\hat{Y}$ and $Y$:  
+
+$$
+\mbox{E}\{ (\hat{Y} - Y)^2  \mid  X=x \}
+$$ 
+
+Due to this property, a succinct description of the main task of Machine Learning is that we use data to estimate
+
+$$
+\mbox{E}\{ Y  \mid  \mathbf{X}=\mathbf{x} \}
+$$
+
+for any set of features $\mathbf{x} = (x_1, \dots, x_p)$. This of course easier said than done, since this function can take any shape $p$ can be very large. Consider a case in which we only have one predictor $x$. The expectation $\mbox{E}\{ Y  \mid  X=x \}$ can be any function of $x$: a line, a parabola, a sine wave, a step function, anything. It get's even more complicated when we consider cases with large $p$ in which case $\mbox{E}\{ Y  \mid  \mathbf{X}=\mathbf{x} \}$ is a function a multidimensional vector $\mathbf{x}$. In our digit reader example $p = 784$. The main way in which Machine Learning algorithms differ in the approach to estimating this expectation. 
+
+
+# Logistic Regression
+
+We have data to build this prediction algorithm from the height poll we took for the course:
+
+```{r, echo=FALSE}
+library(dslabs)
+data("heights")
+```
+
+If we define the outcome $Y$ as 1 for females and 0 for males and $X$ as the height, in this case we are interested in the conditional probability:
+
+$$
+\mbox{Pr}( Y = 1 \mid X = x)
+$$
+
+As an example, let's provide a prediction for a student that is 66 inches tall.  What is the conditional probability of being female if you are 66 inches tall? In our dataset we can estimate this by rounding to the nearest inch and computing:
+
+```{r}
+heights %>% 
+  filter(round(height)==66) %>%
+  summarize(mean(sex=="Female"))
+```
+
+
+We will define $Y=1$ for males and $Y=0$ for females. To construct a prediction algorithm we want to estimate the proportion of the population that is male for any given height $X=x$ which we write as 
+
+$$
+\mbox{Pr}( Y = 1 | X=x) 
+$$
+
+Let's see what this looks like for several values of $x$ (we will remove values of $x$ with few data points):
+
+```{r}
+heights %>% 
+  mutate(x = round(height)) %>%
+  group_by(x) %>%
+  filter(n() >= 10) %>%
+  summarize(prob = mean(sex == "Female")) %>%
+  ggplot(aes(x, prob)) +
+  geom_point()
+```
+
+
+Since the results from the plot above look close to linear, and it is the only approach we currently know how to fit, we will try regression. We assumes that:
+
+$$f(x) = \mbox{Pr}( Y = 1 | X=x)  = \beta_0 + \beta_1 x$$
+
+We can estimate $\beta_0$ and $\beta_1$ with least squares. 
+
+```{r}
+library(broom)
+betas <- train_set %>% 
+  mutate(Y = as.numeric(sex == "Male")) %>% 
+  do(tidy(lm(Y ~ height, data = .))) %>%
+  .$estimate
+```
+
+
+Once we have estimates $\hat{\beta}_0$ and $\hat{\beta}_1$ we can obtain an actual prediction rule:
+
+$$
+\hat{f}(x) = \hat{\beta}_0+ \hat{\beta}_1 x
+$$
+
+and predict male if $\hat{f}(x) > 0.5$. We can compare our predictions to the outcomes using:
+
+```{r}
+prediction <- ifelse(betas[1] + betas[2]*test_set$height > 0.5, "Male", "Female")
+confusionMatrix(data = prediction, reference = test_set$sex)
+```
+
+
+As before we see an imbalance of specificity and sensitivity. In this case we can fix this by changing the probability cutoff. We can use Bayes to this since we know the prevalence
+
+```{r}
+prev <- mean(train_set$sex=="Male")
+p_hat <- betas[1] + betas[2]*test_set$height 
+y_hat <- ifelse(p_hat > prev, "Male", "Female")
+confusionMatrix(data = y_hat, reference = test_set$sex)
+```
+
+Note the improvement in both the balanced accuracy. Also note that the cutoff we chose is right between the average male and average female:
+
+```{r}
+(prev - betas[1])/betas[2]
+```
+
+One problem with this approach is that the estimated $p(x)$ can be outside the [0,1] range:
+
+```{r}
+range(betas[1] + betas[2]*test_set$height)
+```
+
+
+An extension of the regression model above that permits us to continue using regression-like models is to apply transformations that eliminate this disconnect. In the case of binary data the most common approach is to fit a _logistic regression_ model which makes use of the _logistics_ transformation 
+
+$$ g(p) = \log \frac{p}{1-p}$$
+
+This logistic transformation converts probability to log odds. Odds are how much more likely something will happen compared to not happening. So $p=0.5$ means the odds are 1 to 1 and the log odds 0. If $p=0.75$ the odds are 3 to 1. A nice characteristic of this transformation is that transforms probabilities to be symmetric around 0:
+
+```{r}
+p <- seq(0.01,.99,len=100)
+qplot(p, log( p/(1-p) ), geom="line")
+```
+
+Logistic regression simply fits the following model to data:
+
+$$ 
+g\left\{ \mbox{Pr}(Y = 1 \mid X=x) \right\} = \beta_0 + \beta_1 x
+$$
+
+Instead of least squares we compute the _maximum likelihood estimate_ (MLE). You can learn more about this concept in a [statistical theory text](http://www.amazon.com/Mathematical-Statistics-Analysis-Available-Enhanced/dp/0534399428). 
+
+In R we can fit the model and obtain predictions in a similar way to using `lm`. We use the function `glm` and specify the family (`glm` is more general the logistic). When using predict we also need to specify what prediction we want. You can get help using `?predict.glm`
+
+
+```{r}
+fit <- train_set %>% 
+  glm(sex ~ height, data=., family = "binomial")
+```
+
+The predictions don't actually change much:
+
+```{r}
+p_hat_logit <- predict(fit, newdata = test_set, type="response")
+plot(p_hat, p_hat_logit)
+
+```
+
+
+```{r}
+y_hat_logit <- ifelse(p_hat_logit > prev, "Male", "Female")
+confusionMatrix(data = y_hat_logit, reference = test_set$sex)
+```
+
+## Bayes' Rule
+
+The best we can do in a Machine Learning problem is when we actually know
+
+$$
+p(x) = \mbox{Pr}(Y=1|X=x) 
+$$
+
+This gives us what we call _Bayes' Rule_. However, in practice we don't know Bayes' Rule and estimating it is the main challenge.
+
+
+# Naive Bayes
+
+
+_Naive Bayes_ is an approach that tries to estimate $\mbox{Pr}(Y=1|X=x) $ using Bayes theorem.
+
+In this particular example we know that the normal distribution works rather well for the heights $X$ for both classes $y=1$ (female) and $y=0$ (male). This implies that we can approximate the distributions $p_{X|Y=1}$ and $p_{X|Y=0}$. We can easily estimate parameters from the data:
+
+```{r}
+params <- train_set %>% 
+  group_by(sex) %>% 
+  summarize(avg = mean(height), sd = sd(height))
+params
+```
+
+
+Using Bayes rule we can compute:
+
+$$
+f(x) = \mbox{Pr}(Y=1|X=x) = \frac{\pi p_{X|Y=1}(x)}
+{(1-\pi) p_{X|Y=0}(x) + \pi p_{X|Y=1}(x)}
+$$
+
+Here $\pi$ is the probability of being a male. Which for our class we can easily compute
+
+```{r}
+pi <- train_set %>% summarize(pi=mean(sex=="Femalse")) %>% .$pi
+```
+
+
+New we can use our estimates of average and standard deviation estimates to get an actual rule:
+
+```{r}
+x <- train_set$height
+p0 <- dnorm(x, params$avg[1], params$sd[1])
+p1 <- dnorm(x, params$avg[2], params$sd[2])
+p_hat_bayes <- pi*p1/(pi*p1 + (1-pi)*p0)
+```
+
+Mathematically we can show that in this very similar to the GLM prediction. However, we leave the demonstration to a more advanced text: such as [this one](http://statweb.stanford.edu/~tibs/ElemStatLearn/). We can see this empirically:
+
+```{r}
+qplot(y_hat_logit, p_hat_bayes)
+```
+
+Note that once we have more than one predictor, the probability densities get much more complicated.
+
+## Multiple Predictors  
+
+In the two simple examples above we only had one predictor. We actually do not consider these machine learning challenges, which are characterized by including many predictors. Let's go back to the digits example in which we had 784 predictors. For illustrative purposes we will build an example with 2 features and only two classes, 2s and 7s. Then we will go back to the original 784 feature example.
+
+First lets filter to include only 2 and 7s:
+```{r}
+if(!exists("digits")){
+  url <- "https://raw.githubusercontent.com/datasciencelabs/data/master/hand-written-digits-train.csv"
+digits <- read_csv(url)
+}
+dat27 <- digits %>% filter(label%in%c(2,7))
+## labels are not numbers
+dat27 <- mutate(dat27, label =  as.character(label))
+```
+
+
+Note that two distinguish 2s from 7s it might be enough to look at the number of non-white pixels in the upper-left and lower-bottom quadrants:
+
+```{r, echo=FALSE}
+tmp <- lapply( c(40,45), function(i){
+    expand.grid(Row=1:28, Column=1:28) %>%  
+      mutate(id=i, label=dat27$label[i],  
+             value = unlist(dat27[i,-1])) 
+})
+tmp <- Reduce(rbind, tmp)
+tmp %>% ggplot(aes(Row, Column, fill=value)) + 
+    geom_raster() + 
+    scale_y_reverse() +
+    scale_fill_gradient(low="white", high="black") +
+    facet_grid(.~label) + 
+    geom_vline(xintercept = 14.5) +
+    geom_hline(yintercept = 14.5)
+```
+
+So we will define two features $X_1$ and $X_2$ as the percent of non-white pixels in these two quadrants respectively. We add these two features to the `dat27` table
+
+```{r}
+row_column <- expand.grid(row=1:28, col=1:28)
+ind1 <- which(row_column$col <= 14 & row_column$row <=14)
+ind2 <- which(row_column$col > 14 & row_column$row > 14)
+ind <- c(ind1,ind2)
+X <- as.matrix(dat27[,-1])
+X <- X>200
+X1 <- rowSums(X[,ind1])/rowSums(X)
+X2 <- rowSums(X[,ind2])/rowSums(X)
+dat27 <- mutate(dat27, X_1 = X1, X_2 = X2)
+```
+
+For illustrative purposes we consider this to be the population and use this data to define an $f(X_1, X_2)$. Here is $f$ as a function of $X_1, X_2)$.
+
+```{r, echo=FALSE, cache=TRUE}
+y <- as.factor(dat27$label)
+x <- cbind(X1, X2)
+library(RColorBrewer)
+my_colors <- brewer.pal(11,"RdBu")
+library(caret)
+fit <- knn3(x, y, 401)
+GS <- 150
+X1s <- seq(min(X1),max(X1),len=GS)
+X2s <- seq(min(X2),max(X2),len=GS)
+df <- expand.grid(X_1=X1s, X_2=X2s)
+yhat <- predict(fit, newdata = df, type="prob")[,2]
+df <- mutate(df, yhat=yhat)
+f <- loess(yhat~X_1*X_2, data=df, 
+           degree=1, span=1/5)$fitted
+
+df <- df %>% mutate(f=f) 
+true_f <- df %>%
+  ggplot(aes(X_1, X_2, fill=f))  +
+  scale_fill_gradientn(colors=c("#00BFC4","white","#F8766D"))+ geom_raster() 
+true_f
+```
+
+Next we will take a smaller random sample to mimic our training data as well as out test data.
+
+```{r}
+set.seed(1971)
+dat <- sample_n(dat27, 1000)
+dat <- dat %>% mutate(y = ifelse(label=="2",0,1 ))
+```
+
+We start by creating a train and test sets using the `caret` package:
+
+```{r}
+library(caret)
+inTrain <- createDataPartition(y = dat$label, p=0.5)
+train_set <- slice(dat, inTrain$Resample1)
+test_set <- slice(dat, -inTrain$Resample1)
+```
+
+We can visualize the training data now using color to denote the classes:
+
+```{r}
+train_set %>% ggplot(aes(X_1, X_2, fill = label)) +
+  geom_point(pch=21,cex=5) 
+```
+
+Let's try logistic regression. The model is simply:
+
+$$ g(\mbox{Pr}(Y=1 \mid X_1=x_1 , X_2 = x_2) = 
+\beta_0 + \beta_1 x_1 + \beta_2 x_2$$
+
+and we fit it like this:
+```{r}
+fit <-  glm(y~X_1+X_2, data=train_set, family="binomial")
+```
+
