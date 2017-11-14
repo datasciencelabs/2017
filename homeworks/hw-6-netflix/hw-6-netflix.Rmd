@@ -1,0 +1,34 @@
+---
+title: "Netflix Challenge"
+output: html_document
+---
+
+```{r, echo = FALSE}
+library(knitr)
+opts_chunk$set(cache = TRUE, message = FALSE)
+```
+
+Recommendation systems use rating data from many products and users to make recommendations for a specific user. Netflix uses a recommendation system to predict your ratings for a specific movie.
+
+In October 2006, Netflix offered a challenge to the data science community: _improve our recommendation algorithm by 10% and win a million dollars_. In September 2009, [the winners were announced](http://bits.blogs.nytimes.com/2009/09/21/netflix-awards-1-million-prize-and-starts-a-new-contest/). You can read a good summary of how the winning algorithm was put together [here](http://blog.echen.me/2011/10/24/winning-the-netflix-prize-a-summary/), and a more detailed explanation [here](http://www.netflixprize.com/assets/GrandPrize2009_BPC_BellKor.pdf).
+
+![winners](http://graphics8.nytimes.com/images/2009/09/21/technology/netflixawards.480.jpg)
+
+In this homework, you will build your own recommendation system. You will submit predicted recommendations for a test data set where we have kept the actual recommendations hidden. We will then check your performance on these predictions and have our own Netflix challenge. The winning team, defined by the best root mean squared error (RMSE), will receive a prize. The set that you will have to predict is available on GitHub [here](https://github.com/datasciencelabs/data/blob/master/movielens-test.csv.gz).
+
+RMSE was the metric used to judge entries in the Netflix challenge. The lower the RMSE was on Netflix's quiz set between the submittedrating predictions and the actual ratings, the better the method was. We will be using RMSE to evaluate our machine learning models in  this homework as well.
+
+$$\mbox{RMSE} = \sqrt{\frac{1}{N}\sum_{i=1}^N (\hat{Y}_i - Y_i)^2}$$
+
+Download and load the [large training data set which is compressed](https://github.com/datasciencelabs/data/blob/master/movielens-train.csv.gz) into R. Train a machine learning model of you choice. You may wish to utilize a technique such as cross-validation to optimize any parameters associated with your model, and you may implement any modelling technique you feel comfortable with. This may include regression, regularization techniques, matrix decompositions (such as utilized by the winning team [here](http://www.netflixprize.com/assets/ProgressPrize2008_BellKor.pdf)), etc.
+
+**Hint 1**: You can read in compressed file with `read_csv(gzfile(filename))`
+
+**Hint 2**: Use the `RMSE()` function below to check your accuracy.
+```{r}
+RMSE <- function(true_ratings, predicted_ratings){
+    sqrt(mean((true_ratings - predicted_ratings)^2))
+}
+```
+
+Download the test data set available on GitHub [here](https://github.com/datasciencelabs/data/blob/master/movielens-test.csv.gz). Make predictions to fill in the `NA`s and save a file with the same format but with the ratings filled in to your repo. Submit this as a `.csv` file with your name in the file name (the file does not need to be compressed), along with the code you utilized to train the model, as part of your homework. 
