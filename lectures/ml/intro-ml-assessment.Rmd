@@ -14,6 +14,12 @@ e. Siri
 
 3. Create a predictor by rounding the heights to the nearest inch. What is the conditional probability of being Male if you are 70 inches tall?
 
+```{r}
+heights %>% mutate(height = round(height)) %>%
+  filter(height==70) %>%
+  summarize(mean(sex=="Male"))
+
+```
 
 4. Define the following predictor
 
@@ -21,5 +27,13 @@ e. Siri
 X = round(heights$height)
 ```
 
-Estimate $f(x) = \mbox{Pr}( y = 1 | X=x)$ for each $x$ and plot it against $x$.
+Estimate $p(x) = \mbox{Pr}( y = 1 | X=x)$ for each $x$ and plot it against $x$.
+
+```{r}
+heights %>% mutate(X = round(height)) %>%
+  group_by(X) %>%
+  summarize(pr = mean(sex=="Male")) %>%
+  ggplot(aes(X, pr)) +
+  geom_point()
+```
 
