@@ -698,7 +698,7 @@ fit_loess<- loess(yhat ~ X_1*X_2, data=p_x,
 p_x <- p_x %>% mutate(p = fit_loess) 
 p_x_plot <- p_x %>%
   ggplot(aes(X_1, X_2, fill=fit_loess))  +
-  scale_fill_gradientn(colors=c("#00BFC4","white","#F8766D"))+
+  scale_fill_gradientn(colors=c("#F8766D","white","#00BFC4"))+
   geom_raster() 
 p_x_plot
 ```
@@ -765,7 +765,7 @@ The estimate $\hat{p}(x_1, x_2)$ does not approximate the $p(x_1, x_2)$ very wel
 ```{r}
 p_x %>% mutate(p = predict(fit, newdata = .)) %>%
   ggplot(aes(X_1, X_2, fill=p))  +
-  scale_fill_gradientn(colors=c("#00BFC4","white","#F8766D"))+ geom_raster() 
+  scale_fill_gradientn(colors=c("#F8766D","white","#00BFC4"))+ geom_raster() 
 ```
 
 Given the shape of $p(x_1, x_2)$ it is impossible for a logistic regression model to provide a decent estimate because with logistic regression can only the estimate can only be a plane and the true conditional probability is not:
@@ -1148,7 +1148,7 @@ This already improves over the logistics model. Let's see why this is:
 f_hat <- predict(knn_fit, newdata = p_x)[,2]
 g1 <- p_x %>% mutate(f_hat = f_hat) %>%
   ggplot(aes(X_1, X_2, fill=f_hat))  +
-  scale_fill_gradientn(colors=c("#00BFC4","white","#F8766D")) + geom_raster()  + guides(fill=FALSE) +  
+  scale_fill_gradientn(colors=c("#F8766D","white","#00BFC4")) + geom_raster()  + guides(fill=FALSE) +  
   stat_contour(aes(x=X_1,y=X_2,z=f_hat),data=p_x, breaks=c(0.5),color="black",lwd=1.5)
 
 g2 <- ggplot(p_x) +  
@@ -1190,7 +1190,7 @@ We can see the over-fitting problem in this figure:
 f_hat <- predict(knn_fit_1, newdata = p_x)[,2]
 g1 <- p_x %>% mutate(f_hat = f_hat) %>%
   ggplot(aes(X_1, X_2, fill=f_hat))  +
-  scale_fill_gradientn(colors=c("#00BFC4","white","#F8766D")) + geom_raster()  + guides(fill=FALSE) +  
+  scale_fill_gradientn(colors=c("#F8766D","white","#00BFC4")) + geom_raster()  + guides(fill=FALSE) +  
   stat_contour(aes(x=X_1,y=X_2,z=f_hat),data=p_x, breaks=c(0.5),color="black",lwd=1.5)
 
 g2 <- ggplot(p_x) +  
@@ -1214,7 +1214,7 @@ This turns out to be similar to logistic regression:
 f_hat <- predict(knn_fit_251, newdata = p_x)[,2]
 g1 <- p_x %>% mutate(f_hat = f_hat) %>%
   ggplot(aes(X_1, X_2, fill=f_hat))  +
-  scale_fill_gradientn(colors=c("#00BFC4","white","#F8766D")) + geom_raster()  + guides(fill=FALSE) +  
+  scale_fill_gradientn(colors=c("#F8766D","white","#00BFC4")) + geom_raster()  + guides(fill=FALSE) +  
   stat_contour(aes(x=X_1,y=X_2,z=f_hat),data=p_x, breaks=c(0.5),color="black",lwd=1.5)
 
 g2 <- ggplot(p_x) +  
@@ -1249,12 +1249,12 @@ f_hat <- predict(knn_fit, newdata = p_x)[,2]
 
 g1 <- p_x %>%
   ggplot(aes(X_1, X_2, fill=p))  +
-  scale_fill_gradientn(colors=c("#00BFC4","white","#F8766D")) + geom_raster()  + guides(fill=FALSE) +  
+  scale_fill_gradientn(colors=c("#F8766D","white","#00BFC4")) + geom_raster()  + guides(fill=FALSE) +  
   stat_contour(aes(x=X_1,y=X_2,z=p),data=p_x, breaks=c(0.5),color="black",lwd=1.5)
 
 g2 <- p_x %>% mutate(f_hat = f_hat) %>%
   ggplot(aes(X_1, X_2, fill=f_hat))  +
-  scale_fill_gradientn(colors=c("#00BFC4","white","#F8766D")) + geom_raster()  + guides(fill=FALSE) +  
+  scale_fill_gradientn(colors=c("#F8766D","white","#00BFC4")) + geom_raster()  + guides(fill=FALSE) +  
   stat_contour(aes(x=X_1,y=X_2,z=f_hat),data=p_x, breaks=c(0.5),color="black",lwd=1.5)
  
 library(gridExtra)
