@@ -311,8 +311,8 @@ We can compute the probability that an error was made given a reported height of
 ```{r}
 ## Your code here
 pi <- 0.01
-pnorm(65, avg, sd) * pi/
-  (pnorm(65, avg, sd) * pi + pnorm(55, avg, sd) * (1-pi))
+dnorm(65, avg, sd) * pi/
+  (dnorm(65, avg, sd) * pi + dnorm(55, avg, sd) * (1-pi))
 ```
 
 ## Problem 2D
@@ -324,8 +324,8 @@ Now, what if we look at different $\pi$ values? Generate a plot for $\mbox{Pr}(Z
 ```{r}
 ## Your code here
 pi <- seq(0.001, 0.10, len=100) 
-posterior <- pnorm(65, avg, sd) * pi/
-  (pnorm(65, avg, sd) * pi + pnorm(55, avg, sd) * (1-pi))
+posterior <- dnorm(65, avg, sd) * pi/
+  (dnorm(65, avg, sd) * pi + dnorm(55, avg, sd) * (1-pi))
   
 data.frame(posterior,pi) %>% 
   ggplot() +
@@ -351,8 +351,8 @@ $$
 ## Your code here
 pi <- 0.01
 y <- seq(50, 59, 1)
-posterior <- pnorm(y+10, avg, sd) * pi/
-  (pnorm(y+10, avg, sd) * pi + pnorm(y, avg, sd) * (1-pi))
+posterior <- dnorm(y+10, avg, sd) * pi/
+  (dnorm(y+10, avg, sd) * pi + dnorm(y, avg, sd) * (1-pi))
 data.frame(posterior,y) %>%
   ggplot() +
   geom_point(aes(x = y, y = posterior))+
