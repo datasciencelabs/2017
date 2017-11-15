@@ -76,7 +76,7 @@ Let's consider an example. The first thing that happens to a letter when they ar
 knitr::include_graphics("http://appicationletter.com/wp-content/uploads/2017/09/finishedenvelope-x69070.jpg")
 ```
 
-Originally humans had to sort these by hand. To do this they had to read the zip codes on each letter. Today thanks to machine learning algorithms, a computer can read zip codes and then a robot sorts the letters. In this chapter we will learn how to build algorithms that can read a digit.
+Originally humans had to sort these by hand. To do this they had to read the zip codes on each letter. Today thanks to machine learning algorithms, a computer can read zip codes and then a robot sorts the letters. In this lecture we will learn how to build algorithms that can read a digit.
 
 The first step in building an algorithm is to understand 
 what are the outcomes and features? Below are three images of written digits. These have already been read by a human and assigned an outcome $y$. These are considered known and serve as the training set. 
@@ -281,7 +281,7 @@ The caret function `confusionMatrix` computes all these metrics for us once we d
 confusionMatrix(data = y_hat, reference = test_set$sex)
 ```
 
-We can see that the high accuracy is possible despite relatively low sensitivity. The reason this can happen is that the low prevalence: because the proportion is females is low, incorrectly classifying them as males does not lower the accuracy as much as it is increased by most males being predicted as males. This is an example of why it important to examine sensitivity and specificity and not just accuracy. 
+We can see that the high accuracy is possible despite relatively low sensitivity. The reason this can happen is the low prevalence: because the proportion is females is low, incorrectly classifying them as males does not lower the accuracy as much as it is increased by most males being predicted as males. This is an example of why it important to examine sensitivity and specificity and not just accuracy. 
 
 However, it is often useful to have one number summary, for example for optimization pursposes. One metric is simply the average of specificity and sensitivity, refered to as  _balanced accuracy_. However, because these are rates, it is more appropriate to compute the harmonic average of specificity and sensitivity. In fact the _F$_1$-score_, a widely used one number summary, is harmonic average of precision and recall:
 
@@ -360,7 +360,7 @@ If we know $p_k(x)$ then we can optimize our predictions by, for example, predic
 
 $$\hat{Y} = \max_k p_k(x)$$
 
-As discussed above, sensitivity and specificity may differ in importance in different contexts. For this reason, maximizing the probability is not always optimal in practice and depends on the context. But even in these cases, knowing $p_k(x)$ will suffice for all to build optimal prediction models, since we can inform our predictions based on these probabilities and contro specificity and sensitivty however we wish. For example, we can simply change the cutoffs used to predict one outcome or the other. In the plane example given above, we may ground the plane anytime the probability of malfunction is higher than 1/1000 as opposed to the default 1/2 used when error types are equally undesired. 
+As discussed above, sensitivity and specificity may differ in importance in different contexts. For this reason, maximizing the probability is not always optimal in practice and depends on the context. But even in these cases, knowing $p_k(x)$ will suffice for all to build optimal prediction models, since we can inform our predictions based on these probabilities and control specificity and sensitivty however we wish. For example, we can simply change the cutoffs used to predict one outcome or the other. In the plane example given above, we may ground the plane anytime the probability of malfunction is higher than 1/1000 as opposed to the default 1/2 used when error types are equally undesired. 
 
 To simplify the exposition below, let's consider the predicting sex example which is binary data case. 
 
@@ -382,7 +382,7 @@ heights %>%
   summarize(mean(sex=="Female"))
 ```
 
-Using data exploration let's what this estimate of our conditional probability looks like for several values of $x$. (We will remove values of $x$ with few data points usin the `n()` function.
+Using data exploration let's see what this estimate of our conditional probability looks like for several values of $x$. We will remove values of $x$ with few data points usin the `n()` function.
 
 ```{r}
 heights %>% 
@@ -455,7 +455,7 @@ In the case of binary data the most common approach is to fit a _logistic regres
 
 $$ g(p) = \log \frac{p}{1-p}$$
 
-This logistic transformation converts probability to log odds. As discussed in the data visualization chapter, the odds tell use  how much more likely something will happen compared to not happening. So $p=0.5$ means the odds are 1 to 1, thus the odds are 1. If $p=0.75$ the odds are 3 to 1. A nice characteristic of this transformation is that transforms probabilities to be symmetric around 0. Here is a plot of $g(p)$ versus $p$:
+This logistic transformation converts probability to log odds. As discussed in the data visualization lecture, the odds tell use  how much more likely something will happen compared to not happening. So $p=0.5$ means the odds are 1 to 1, thus the odds are 1. If $p=0.75$ the odds are 3 to 1. A nice characteristic of this transformation is that it transforms probabilities to be symmetric around 0. Here is a plot of $g(p)$ versus $p$:
 
 ```{r p-versus-logistic-of-p, echo=FALSE}
 p <- seq(0.01,.99,len=100)
@@ -555,7 +555,7 @@ f1 <- dnorm(x, params$avg[1], params$sd[1])
 p_hat_bayes <- f1*pi / (f1*pi + f0*(1 - pi))
 ```
 
-Our naive Bayes estimate $\hat{p}(x)$ looks a lot like out logistic regression estimate:
+Our naive Bayes estimate $\hat{p}(x)$ looks a lot like our logistic regression estimate:
 
 ```{r conditional-prob-glm-fit-2, echo=FALSE }
 tmp <- heights %>% 
@@ -575,7 +575,7 @@ tmp %>%
 ```
 
 
-In fact, we can show that the naive Bayes approach is similar to the logistic regression prediction mathematically we can show . However, we leave the demonstration to a more advanced text: such as [this one](http://statweb.stanford.edu/~tibs/ElemStatLearn/). We can see that they are similar empirically:
+In fact, we can show that the naive Bayes approach is similar to the logistic regression prediction mathematically. However, we leave the demonstration to a more advanced text: such as [this one](http://statweb.stanford.edu/~tibs/ElemStatLearn/). We can see that they are similar empirically:
 
 ```{r}
 qplot(p_hat_logit, p_hat_bayes) + geom_abline()
@@ -589,7 +589,7 @@ $$
 \hat{p}(x)= \frac{\hat{f}_{X|Y=1}(x) \hat{\pi}}
 { \hat{f}_{X|Y=0}(x)(1-\hat{\pi}) + \hat{f}_{X|Y=1}(x)\hat{\pi} }
 $$
-As we discussed about, our sample has a much lower prevalence, `r pi`, than the general population. So if we use the rule $\hat{p}(x)>0.5$ to predict females our accuracy will be affected due to the low sensitivity: 
+As we discussed, our sample has a much lower prevalence, `r pi`, than the general population. So if we use the rule $\hat{p}(x)>0.5$ to predict females our accuracy will be affected due to the low sensitivity: 
 
 ```{r}
 y_hat_bayes <- ifelse(p_hat_bayes > 0.5, "Female", "Male")
@@ -601,7 +601,7 @@ Again, this is because the algorithm gives more weight to specificity to account
 specificity(data = factor(y_hat_bayes), reference = factor(test_set$sex))
 ```
 
-This is due mainly to the fact that $\hat{\pi}$ is substantially less than 0.5 so we tend to predict `Male` more often. It makes sense for a machine learnign algorithm to do this in our sample, because we do have a higher percentage of males. But if we were to extrapolate this to a general population our oveall accuracy would be affected by the low sensitivity. 
+This is due mainly to the fact that $\hat{\pi}$ is substantially less than 0.5 so we tend to predict `Male` more often. It makes sense for a machine learning algorithm to do this in our sample, because we do have a higher percentage of males. But if we were to extrapolate this to a general population our overall accuracy would be affected by the low sensitivity. 
 
 The naive Bayes approach gives us a direct way to correct this since we can simply force $\hat{pi}$ to be, for example, $\pi$. So to balance specificity and sensitivity, instead of changint the cutoff in the decision rule we could simply change $\hat{\pi}$:
 
@@ -678,7 +678,7 @@ digits_27 <- digits_27 %>%
          X_1 = X1, X_2 = X2)
 ```
 
-For illustrative purposes we consider this to be the population and use this data to define an $p(X_1, X_2)$. Here is the conditional probability as a function of $(X_1, X_2)$.
+For illustrative purposes we consider this to be the population and use this data to define a function $p(X_1, X_2)$. Here is the conditional probability of being a 7 as a function of $(X_1, X_2)$.
 
 ```{r, echo=FALSE, cache=TRUE}
 y <- as.factor(digits_27$label)
@@ -703,14 +703,14 @@ p_x_plot <- p_x %>%
 p_x_plot
 ```
 
-Next we will take a smaller random sample to mimic our training data as well as out test data.
+Next we will take a smaller random sample to mimic our training data as well as our test data.
 
 ```{r}
 set.seed(1971)
 dat <- sample_n(digits_27, 1000)
 ```
 
-We start by creating a train and test sets using the `caret` package:
+We start by creating a train and test set using the `caret` package:
 
 ```{r}
 library(caret)
@@ -774,7 +774,7 @@ Given the shape of $p(x_1, x_2)$ it is impossible for a logistic regression mode
 p_x_plot
 ```
 
-We will learn other machine learnign algorithms that provide more flexibility. Several of these are based on the concept of _smoothing_, the topic of our next section
+We will learn other machine learning algorithms that provide more flexibility. Several of these are based on the concept of _smoothing_, the topic of our next section
 
 
 ## Smoothing
@@ -867,7 +867,7 @@ By computing this mean for bins around every point, we form an estimate of the u
 
 The final result looks like this (code not shown):
 
-```{r, fig.width=10.5,fig.height=5.25, fig.align="center"}
+```{r, fig.width=10.5,fig.height=5.25, fig.align="center", echo=FALSE}
 mod <- ksmooth(polls_2008$X, polls_2008$Y, kernel="box", 
                bandwidth = span)
 bin_fit <- data.frame(X=polls_2008$X, .fitted=mod$y)
@@ -878,9 +878,9 @@ ggplot(polls_2008, aes(X, Y)) +
 
 ## Kernels  
 
-Note that the final project is quite wiggly. One reason for this is that each time the window moves 2 points change. We can attenuate this somewhat by taking weighted averages that give the center point more weight and far away less points.
+Note that the final product is quite wiggly. One reason for this is that each time the window moves 2 points change. We can attenuate this somewhat by taking weighted averages that give the center point more weight and far away less points.
 
-In this animation we see that points on the edge get less weight:
+In this animation we see that points on the edge get less weight (denoted by their shading):
 
 ![bin_smoother2](img/binsmoother2.gif)
 
@@ -907,7 +907,7 @@ Local weighted regression (loess) is similar to bin smoothing in principle. The 
 As we did for the bin smoother, we show 12 steps of the process that leads to a loess fit (code not shown):
 
 
-```{r  fig.width=10.5,fig.height=5.25, fig.align="center"}
+```{r  fig.width=10.5,fig.height=5.25, fig.align="center", echo=FALSE}
 span <- 0.05
 
 dat2 <- polls_2008 %>%
@@ -982,7 +982,8 @@ ggplot(polls_2008, aes(X, Y)) +
   facet_wrap(~span)
 ```
 
-Note the `ggplot` uses loess in its `geom_smooth` function. But be careful with default behavior. The `ggplot`
+Note the `ggplot` uses loess in its `geom_smooth` function. But be careful with default behavior. The default span is rather large, so you'll want to try out different values.
+
 ```{r, fig.width=10.5,fig.height=5.25, fig.align="center"}
 ggplot(polls_2008, aes(X, Y)) +
   geom_point(shape=1) + geom_smooth(color="red")
@@ -1062,7 +1063,7 @@ thrid_row <- X[3,]
 tenth_column <- X[,10]
 ```
 
-So the first to observations are 2s and the 253rd is a 7. Let's see if their distances match this:
+So the first two observations are 2s and the 253rd is a 7. Let's see if their distances match this:
 ```{r}
 X_1 <- X[1,]
 X_2 <- X[2,]
@@ -1071,7 +1072,7 @@ sqrt(sum((X_1-X_2)^2))
 sqrt(sum((X_1-X_253)^2))
 ```
 
-As expected, the 2 are closer to each other. If you know matrix algebra, note that a faster way to compute this is using matrix algebra:
+As expected, the 2s are closer to each other. If you know matrix algebra, note that a faster way to compute this is using matrix algebra:
 
 ```{r}
 sqrt( crossprod(X_1-X_2) )
@@ -1117,7 +1118,7 @@ image(as.matrix(dist(t(X))))
 ## k Nearest Neighbors
 
 
-K-nearest neighbors (kNN) is similar to bin smoothing, but it is easier to adapt to multiple dimensions. We first define the distance between all observations based on the features.Basically, for any point $\bf{x}$ for which we want an estimate of $f(\bf{x})$, we look for the $k$ nearest points and then take an average of these points. This gives us an estimate of $f(x_1,x_2)$, just like the bin smoother gave us an estimate of a curve. We can now control flexibility through $k$. 
+K-nearest neighbors (kNN) is similar to bin smoothing, but it is easier to adapt to multiple dimensions. We first define the distance between all observations based on the features.Basically, for any point $\bf{x}$ for which we want an estimate of $p(\bf{x})$, we look for the $k$ nearest points and then take an average of these points. This gives us an estimate of $p(x_1,x_2)$, just like the bin smoother gave us an estimate of a curve. We can now control flexibility through $k$. 
 
 Let's use our logistic regression as a straw man:
 
@@ -1170,7 +1171,7 @@ confusionMatrix(tab)$overall["Accuracy"]
 
 ## Over Training
 
-Over-training is at its worse when we set a $k=1$. In this case we ill obtain perfect accuracy in the training set because each point is used to predict itself. So perfect accuracy must happen by definition. However, the test set accuracy is actually worse than logistics regression.
+Over-training is at its worse when we set a $k=1$. In this case we ill obtain perfect accuracy in the training set because each point is used to predict itself. So perfect accuracy must happen by definition. However, the test set accuracy is actually worse than logistic regression.
 
 ```{r}
 knn_fit_1 <- knn3(y~.,data = select(train_set, y, X_1, X_2), k=1)
