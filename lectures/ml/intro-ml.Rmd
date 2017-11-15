@@ -575,7 +575,7 @@ tmp %>%
 ```
 
 
-In fact, we can show that the naive Bayes approach is similar to the logistic regression prediction mathematically. However, we leave the demonstration to a more advanced text: such as [this one](http://statweb.stanford.edu/~tibs/ElemStatLearn/). We can see that they are similar empirically:
+In fact, we can show that the naive Bayes approach is similar to the logistic regression prediction mathematically. However, we leave the demonstration to a more advanced text: such as [this one](https://web.stanford.edu/~hastie/Papers/ESLII.pdf). We can see that they are similar empirically:
 
 ```{r}
 qplot(p_hat_logit, p_hat_bayes) + geom_abline()
