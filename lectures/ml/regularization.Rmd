@@ -33,7 +33,9 @@ One of the statistical techniques they used to improve prediction was _regulariz
 We start by loading [large data set which is compressed](https://github.com/datasciencelabs/data/blob/master/movielens-train.csv.gz) into R. 
 
 ```{r}
-filename <- "~/Downloads/movielens-train.csv.gz"
+filename <- tempfile()
+url <- "https://github.com/datasciencelabs/data/blob/master/movielens-train.csv.gz?raw=true"
+download.file(url, filename)
 ratings <- read_csv(gzfile(filename)) 
 ```
 

@@ -1,15 +1,11 @@
----
-title: "cv"
-output: html_document
----
-
 ## Cross validation
 ```{r, message=FALSE, warning=FALSE}
 library(readr)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
-theme_set(theme_bw(base_size = 16))
+library(dslabs)
+ds_theme_set()
 ```
 
 ```{r}
