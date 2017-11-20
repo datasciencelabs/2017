@@ -49,7 +49,7 @@ image(as.matrix(d))
 plot(hclust(d),labels=as.character(X$label))
 ``` 
 
-784 is too much for use to handle in a demo. So let's. We will compress the  predictors by combining groups of 16 pixels. 
+784 is too much to handle in a demo. So we will compress the predictors by combining groups of 16 pixels. 
 
 ```{r}
 tmp <- slice(original_dat,1:100)
@@ -67,7 +67,7 @@ tmp <- tmp %>%  select(-row, -col)
 tmp <- tmp %>% group_by(obs) %>% spread(feature, value) %>% ungroup %>% select(-obs)
 ```
 
-Let's write a function
+Let's write a function to perform the compression.
 
 ```{r}
 compress <- function(tbl, n=4){
@@ -88,8 +88,7 @@ compress <- function(tbl, n=4){
 }
 ```
 
-Compress the entire dataset. This will take a bit:
-
+Now, we compress the entire dataset. This will take a bit of time:
 
 ```{r}
 dat <- compress(original_dat)
@@ -107,13 +106,13 @@ column_means <- colMeans(X)
 plot(table(round(column_means)))
 ```
 
-Let's remove this low information feautures:
+Let's remove these "low information" features:
 
 ```{r}
 keep_columns <- which(column_means>10)
 ``` 
 
-Let's define the training data and test data:
+Let's next define the training data and test data:
 
 ```{r}
 train_set <- slice(dat, inTrain) %>% 
@@ -123,6 +122,7 @@ test_set <- slice(dat, -inTrain) %>%
 ```
 
 Note that the distances look a bit cleaner:
+
 ```{r}
 X <- sample_n(train_set,200) %>% 
                   arrange(label)
@@ -131,7 +131,6 @@ d <- dist(as.matrix(X[,-1]))
 image(as.matrix(d))
 plot(hclust(d),labels=as.character(X$label))
 ``` 
-
 
 
 ```{r}
@@ -153,7 +152,6 @@ pred <- predict(fit, newdata = test_set, type="class")
 tab <- table(pred, test_set$label)
 confusionMatrix(tab)
 ```
-
 
 Compete in Kaggle?
 
