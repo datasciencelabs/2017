@@ -87,7 +87,7 @@ Mathematicall we represnt them with bold upper case letters:
 $$ 
 \mathbf{X} = [ \mathbf{X}_1 \mathbf{X}_2 ] = \begin{pmatrix}
 x_{1,1}&x_{1,2}\\
-\vdots\\
+\vdots&\vdots\\
 x_{N,1}&x_{N,2}
 \end{pmatrix}
 $$
@@ -315,9 +315,17 @@ qplot(X_sample, bins = 30, color = I("black"))
 
 We notice a clear dichotomy which is explained as part with ink and parts without. If we think that values below, say, 25 are  smudges we can quickly make them zero using:
 
-```{r}
-X[X < 50] <- 0
+```{r, eval=FALSE}
+ind <- X < 50
+X[ind] <- 0
 ```
+
+When we type `X < 50` we are constructing a logical matrix. These can be used as indexes for a matrix of the same dimensions. We can even write it like this:
+
+```{r, eval=FALSE}
+X[X<50] <- 0 
+```
+
 
 To see what this does we look at a smaller matrix:
 
@@ -327,7 +335,7 @@ mat[mat < 3] <- 0
 mat
 ```
 
-We can also use logical operations with matrix logicals
+We can also use more complex logical operations with matrix logicals. The operations are performed element by element.
 
 ```{r}
 mat[mat > 6 & mat <12] <- 0
@@ -383,7 +391,6 @@ a_N
    & \vdots & \\
   X_{N,1}-a_n&\dots & X_{N,p} -a_n
   \end{pmatrix}
--
 $$
 
 
@@ -394,12 +401,13 @@ The same holds true for other artimethic operations. This implies that we can sc
 (X - rowMeans(X)) / rowSds(X)
 ```
 
-If you want to scale each column, be careful, it does not work for columns. for columns do this. For we can transpose the matrix:
+If you want to scale each column, be careful, the above does not work for columns but you will not get an error since R will cycle. To do scale the coumns we can transpose the matrix then perform the row operations, then transpose back:
+
 ```{r, eval=FALSE}
 t( t(X) - colMeans(X) )
 ```
 
-We can also use a function called `sweep` the works similarly to `apply`. It takes each entry of a vector and subtracts it from the corresponding row or column.
+We can also use a function called `sweep` that works similarly to `apply`. It takes each entry of a vector and subtracts it from the corresponding row or column.
 
 ```{r, eval=FALSE}
 X_mean_0 <- sweep(X, 2, colMeas(X))
@@ -411,7 +419,6 @@ The function `sweep` actually has another argument that lets you define the arit
 X_mean_0 <- sweep(X, 2, colMeans(X))
 X_standardized <- sweep(X_mean_0, 2, colSds(X), FUN = "/")
 ```
-
 
 
 ## Matrix Algebrea opeations 
