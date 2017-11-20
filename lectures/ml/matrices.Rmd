@@ -324,7 +324,7 @@ To see what this does we look at a smaller matrix:
 
 ```{r}
 mat[mat < 3] <- 0
-mat_2
+mat
 ```
 
 We can also use logical operations with matrix logicals

@@ -30,10 +30,10 @@ One of the statistical techniques they used to improve prediction was _regulariz
 
 ## Ratings Data
 
-We start by loading [large data set which is compressed](https://github.com/datasciencelabs/data/blob/master/movielens-test.csv.gz) into R. 
+We start by loading [large data set which is compressed](https://github.com/datasciencelabs/data/blob/master/movielens-train.csv.gz) into R. 
 
 ```{r}
-filename <- "/Users/ririzarr/myDocuments/teaching/bio260/data/movielens-train.csv.gz"
+filename <- "~/Downloads/movielens-train.csv.gz"
 ratings <- read_csv(gzfile(filename)) 
 ```
 
@@ -54,7 +54,7 @@ ratings %>%
 We can also see the distribution of all ratings:
 
 ```{r}
-ratings %>% samggplot(aes(rating)) + geom_histogram()
+ratings %>% ggplot(aes(rating)) + geom_histogram()
 ```
 
 So we can think of these data as a very large matrix with users on the rows and movies on the columns. The `gather` function permits us to convert it to this format, but if we try it for the entire matrix it will crash R. Let's show the matrix for a few users:

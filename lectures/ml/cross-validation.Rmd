@@ -38,7 +38,7 @@ There a test set with no labels given:
 ```{r}
 url <- "https://raw.githubusercontent.com/datasciencelabs/data/master/hand-written-digits-test.csv"
 original_test<- read_csv(url)
-View(original_test)
+#View(original_test)
 ```
 
 ## Data Exploration
