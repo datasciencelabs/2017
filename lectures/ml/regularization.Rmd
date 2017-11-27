@@ -567,7 +567,7 @@ r %>% kable(align = "c")
 We can visualize this matrix `r` containing these residuals as an image:
 
 ```{r}
-image(r)
+image(t(r))
 ```
 
 We can see some _structure_ in this matix. By structure, we mean that the matrix entries do not appear to be independent identically distributed. Some movies are correlated to each other
@@ -662,7 +662,7 @@ Here is a plot $r_{u,i}$ next to  $\mathbf{p} \mathbf{q}_$:
 ```{r}
 P <- matrix(c(2, 2, 2, 0, 0, 0, 0, 0, -2, -2, -2, -2), ncol=1)
 Q <- matrix(c(1 , 1, 1, -1, -1), ncol=1)
-pq <- P%*%t(Q)
+pq <- P %*% t(Q)
 image(pq)
 image(r)
 ```
@@ -748,6 +748,7 @@ $$
 $$
 
 
+
 Note that 
 $$
 \begin{pmatrix}
@@ -779,6 +780,7 @@ The model now has more parameters, 34,  but still less than the original data 60
 $$
 Y_{u,i} = \mu + b_i + b_u + p_{u,1} q_{1,i} + p_{u,2} q_{2,i} + \varepsilon_{i,j}
 $$
+
 
 For the Netflix challenge, regularization was also used to penalize for large values of $p$ and $q$.
 
@@ -894,7 +896,7 @@ So instead of estimating the praters for the model above, which is not straight-
 
 ```{r}
 r[is.na(r)] <- 0
-pca <- prcomp(r - rowMeans(r), center=TRUE, scale=FALSE) ## svd is faster here
+pca <- prcomp(r - rowMeans(r), center=TRUE, scale=FALSE) 
 
 library(ggrepel)
 
