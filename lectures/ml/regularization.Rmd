@@ -53,7 +53,10 @@ ratings %>%
 We can also see the distribution of all ratings:
 
 ```{r}
-ratings %>% ggplot(aes(rating)) + geom_histogram()
+ratings %>% 
+  sample_n(10000) %>% 
+  ggplot(aes(rating)) + 
+  geom_bar(color="black")
 ```
 
 So we can think of these data as a very large matrix with users on the rows and movies on the columns. The `gather` function permits us to convert it to this format, but if we try it for the entire matrix it will crash R. Let's show the matrix for a few users:
@@ -61,7 +64,7 @@ So we can think of these data as a very large matrix with users on the rows and 
 ```{r}
 url <- "https://raw.githubusercontent.com/datasciencelabs/data/master/movies.csv"
 movies <- movies <- read_csv(url)
-movies$title <- gsub("\\s\\([^)]*\\)","",movies$title) ##take out (year)
+movies$title <- gsub("\\s\\([^)]*\\)", "", movies$title) ##take out (year)
 
 keep <- ratings %>% 
   count(movieId) %>% 
@@ -96,14 +99,14 @@ And here is are the number of ratings per user and per movie:
 p1 <- ratings %>% 
   count(userId) %>% 
   ggplot(aes(n)) + 
-  geom_histogram() + 
+  geom_histogram(bins=30, color="black") + 
   scale_x_log10() + 
   ggtitle("Users")
 
 p2 <- ratings %>% 
   count(movieId) %>% 
   ggplot(aes(n)) + 
-  geom_histogram() + 
+  geom_histogram(bins=30, color="black") + 
   scale_x_log10() + 
   ggtitle("Movies")
 
@@ -125,12 +128,12 @@ rm(ratings) #to save space
 gc() #make sure memory is cleared
 ```
 
-#### Loss function 
+### Loss function 
 
 To performance statistics used in the Netflix challenge was the residual mean squared error (RMSE). This is related to the MSE error function we described earlier. If \hat{Y} is our prediction and $Y$ is the observed rating, then we prefer recommendation systems that minimize:
 
 $$
-\mbox{E}(\hat{Y} - Y)
+\mbox{E}\{(\hat{Y} - Y)^2\}
 $$
 
 In practice we look at the empirical version of this, which is the RMSE:
@@ -193,7 +196,7 @@ We know from experience that some movies are just generally rated higher than ot
 train %>% group_by(movieId) %>% 
   filter(n()>=1000) %>% 
   summarize(avg_rating = mean(rating)) %>% 
-  qplot(avg_rating, geom = "histogram", data = .)
+  qplot(avg_rating, geom = "histogram", color = I("black"), bins=30, data = .)
 ```
 
 So our intuition that different movies are rated differently is confirmed by data. So we can augment our previous model by adding a term $b_i$ to represent average ranking for movie $i$: 
@@ -211,12 +214,12 @@ least square estimate $\hat{b}_i$ is just the average of $Y_{u,i} - \hat{\mu}$
 for each movie $i$. So we can compute them this way.
 
 ```{r}
-mu <- mean(train$rating) ##we already computed this above
+mu <- mean(train$rating) 
 movie_means <- train %>% 
   group_by(movieId) %>% 
   summarize(b_i = mean(rating - mu))
 
-movie_means %>% qplot(b_i, geom ="histogram", data = .)
+qplot(b_i, geom = "histogram", color = I("black"), bins=25, data = movie_means)
 ```
 
 Let's see how much our prediction improves. 
@@ -224,7 +227,7 @@ Let's see how much our prediction improves.
 ```{r}
 joined <- test %>% 
   left_join(movie_means, by='movieId')
-any( is.na(joined$b_i))
+any(is.na(joined$b_i))
 ```
 
 Note that there are movies in the test set that are not on the train set. This means we don't have predictions and the `join` above turn these into NAs. Since we have no data, we will simply predict with the average $b_i$ which is 0.
@@ -262,20 +265,42 @@ These all seem like obscure movies. Many of them have large predictions. Let's l
 
 ```{r}
 movie_means <-  left_join(movie_means, movies) 
+```
+Here are the top ten movies:
+```{r}
+arrange(movie_means, desc(b_i)) %>% 
+  mutate(prediction = mu + b_i) %>%
+  select(title, prediction) %>% 
+  slice(1:10) %>%  kable
+```
 
-## use arrange() to look at top 10 and bottom 10
-arrange(movie_means, desc(b_i)) %>% select(title, b_i) %>% slice(1:10) %>%  kable
-arrange(movie_means, b_i) %>% select(title, b_i) %>% slice(1:10) %>% kable
+Here are the bottom ten:
+```{r}
+arrange(movie_means, b_i) %>% 
+  mutate(prediction = mu + b_i) %>%
+  select(title, prediction) %>% 
+  slice(1:10) %>%  kable
 ```
 
 They all seem to be quite obscure. Let's look at how often they are rated.
 
 ```{r}
-train %>% count(movieId) %>% left_join(movie_means) %>%
-  arrange(b_i) %>% select(title, b_i, n) %>% slice(1:10) %>% kable
+train %>%
+  count(movieId) %>%
+  left_join(movie_means) %>%
+  arrange(desc(b_i)) %>% 
+  mutate(prediction = mu + b_i) %>%
+  select(title, prediction, n) %>% 
+  slice(1:10) %>%  kable
 
-train %>% count(movieId) %>% left_join(movie_means) %>%
-  arrange(desc(b_i)) %>% select(title, b_i, n) %>% slice(1:10) %>% kable
+train %>%
+  count(movieId) %>%
+  left_join(movie_means) %>%
+  arrange(b_i) %>% 
+  mutate(prediction = mu + b_i) %>%
+  select(title, prediction, n) %>% 
+  slice(1:10) %>%  kable
+
 ```
 
 So the supposed "best" and "worst" movies were rated by very few users. These movies were mostly obscure ones. This is because with just a few users,
@@ -315,18 +340,28 @@ Let's compute these regularized estimates of $b_i$ using
 $\lambda=3$. Then, look at the top 10 best and worst movies now.
 
 ```{r}
-lambda <- 3
+lambda <- 5
 mu <- mean(train$rating)
 movie_reg_means <- train %>% 
   group_by(movieId) %>% 
   summarize(b_i = sum(rating - mu)/(n()+lambda), n_i = n()) %>%
   left_join(movies) 
 
-train %>% count(movieId) %>% left_join(movie_reg_means) %>%
-  arrange(b_i) %>% select(title, b_i, n) %>% slice(1:10) %>% kable
+train %>%
+  count(movieId) %>%
+  left_join(movie_reg_means) %>%
+  arrange(desc(b_i)) %>% 
+  mutate(prediction = mu + b_i) %>%
+  select(title, prediction, n) %>% 
+  slice(1:10) %>%  kable
 
-train %>% count(movieId) %>% left_join(movie_reg_means) %>%
-  arrange(desc(b_i)) %>% select(title, b_i, n) %>% slice(1:10) %>% kable
+train %>%
+  count(movieId) %>%
+  left_join(movie_reg_means) %>%
+  arrange(b_i) %>% 
+  mutate(prediction = mu + b_i) %>%
+  select(title, prediction, n) %>% 
+  slice(1:10) %>%  kable
 ```
 
 Do we improve our results?
@@ -359,7 +394,7 @@ data_frame(original = movie_means$b_i,
 We can try other values of lambda:
 
 ```{r}
-lambdas <- seq(0,15)
+lambdas <- seq(0, 8, 0.25)
 mu <- mean(train$rating)
 tmp <- train %>% 
   group_by(movieId) %>% 
@@ -374,6 +409,7 @@ rmses <- sapply(lambdas, function(l){
     return(RMSE(predicted_ratings, test$rating))
 })
 qplot(lambdas, rmses)  
+lambdas[which.min(rmses)]
 ```
 
 ### User effects
@@ -387,7 +423,8 @@ train %>%
   group_by(userId) %>% 
   summarize(b_u=mean(rating)) %>% 
   filter(n()>=100) %>%
-  ggplot(aes(b_u)) + geom_histogram()
+  ggplot(aes(b_u)) + 
+  geom_histogram(bins = 30, color  = "black")
 ```
 
 Note that there is substantial variability across users 
@@ -413,10 +450,10 @@ $$
 \hat{b}_u = \frac{1}{\lambda_2 + n_u} \sum_{i=1}^{n_u} (Y_{u,i} - \hat{\mu} - \hat{b}_i)
 $$
 
-We will use  $\lambda_2=10$:
+We will use  $\lambda_2=5$:
 
 ```{r}
-lambda_2 <- 10
+lambda_2 <- 5
 
 user_reg_means <- train %>% 
   left_join(movie_reg_means) %>%
@@ -437,6 +474,7 @@ rmse_results <- bind_rows(rmse_results,
 
 rmse_results %>% kable
 ```
+
 
 # Matrix Factorization
 
@@ -465,25 +503,22 @@ Let's remove the user and movie bias from this set to create residuals.
 
 ```{r}
 train_small <- train_small %>% 
-  left_join(movie_reg_means) %>% 
-  left_join(user_reg_means) %>%
+  left_join(movie_reg_means, by = "movieId") %>% 
+  left_join(user_reg_means, by = "userId") %>%
   mutate(resids = rating - mu - b_i - b_u)
 ```
 
 Next we create a matrix using `gather`:
 
 ```{r}
-Y <- train_small %>% 
-  select(userId,movieId,resids) %>%
-    spread(movieId, resids) %>% as.matrix()
-rownames(Y) <- Y[,1]
-Y <- Y[,-1]
-movie_titles <- movies$title[match(colnames(Y), movies$movieId)]
-```
+r <- train_small %>% 
+  select(userId, movieId, resids) %>%
+  spread(movieId, resids) %>% 
+  as.matrix()
 
-```{r}
-d=dist(t(Y))
-plot(hclust(d), labels = substring(movie_titles, 1, 15), cex=0.5)
+rownames(r) <- r[,1]
+r <- r[,-1]
+movie_titles <- movies$title[match(colnames(r), movies$movieId)]
 ```
 
 Some examples of movies that correlate:
@@ -514,7 +549,8 @@ If we fit a model with a parameter for each $u,i$ pair we will obviously overest
 
 ## Factors
 
-Here is an illustration of how we could use some structure to predict the $r_{u,i}$. Suppose our residuals look like this.
+Here is an illustration of how we could use some structure to predict the $r_{u,i}$. 
+For this example we have 5 users and 12 movies. So our residual matrix is $12\times 5$:
 
 ```{r, echo=FALSE}
 set.seed(1)
@@ -524,42 +560,126 @@ rownames(Q) <- c("Godfather1","Godfather2","Goodfellas","Pretty Woman","Ghost")
 P <- matrix(rep(c(2,0,-2), c(3,5,4)), ncol=1)
 rownames(P) <- 1:nrow(P)
 
-X <- jitter(P%*%t(Q))
-X %>% kable(align = "c")
+r <- jitter(P%*%t(Q), factor = 2)
+r %>% kable(align = "c")
 ```
 
-There seems to be patter here. In fact we can see strong correlation patterns:
+We can visualize this matrix `r` containing these residuals as an image:
 
 ```{r}
-cor(X)
+image(r)
 ```
 
-The structure seems to be explained by these coefficients.
+We can see some _structure_ in this matix. By structure, we mean that the matrix entries do not appear to be independent identically distributed. Some movies are correlated to each other
 
 ```{r}
+cor(r)
+```
+
+and some users appear to be correlated to each other:
+
+```{r}
+cor(t(r))
+```
+
+In this simple illustration we could describe the variability seen in matrix `r` as coming from two movies: ganster and romance and three groups of users: like gangster movies and hate romance, no preference, like romance but hate gangster.
+
+We can codify the structure using a vector to define the movie groupings:
+
+```{r, echo=FALSE}
 t(Q) %>% kable(aling="c")
 ```
 
-Note that here we can narrow down movies to two groups: gangster and romance. 
-Note we can also reduce the users to three groups. 
+and a vector to define the user groupings:
 
-```{r}
+```{r, echo=FALSE}
 P
 ```
 
-Those that like gangster but hate romance, the reverse, and those that don't care. The main point here is that we can model the 60 residuals with this 17 parameter model:
+Matrix factorization refers to the fact that we have describe the matrix above by _factorizing_ it like this:
 
 $$
 r_{u,i} \approx p_u q_i 
 $$
 
-And we should be able to explain much more of the variance
+with $\mathbf{p} = (p_1, \dots, p_i)$ a $12\times 1$ vector and $\mathbf{q}=(q_1, \dots, q_5)$ a $5 \times 1$ vector. We started with 60 residuals but it appears we can explain most of the variability with just 16 parameters. 
+
+The name _matrxi factorization_ comes from the fact that if we use matrix multiplication, we can wrtie 
 
 $$
-Y_{u,i} = \mu + b_i + b_u + p_u q_i + \varepsilon_{i,j}
+\mathbf{r} \approx \mathbf{p} \mathbf{q}^\top
 $$
 
-Now the structure in our movie data seems to be much more complicated than gangster movie versus romance. We may have other factors. For example we may have:
+
+Since matrix multiplication works like this:
+
+$$
+\begin{pmatrix}
+  p_{1,1} & p_{1,2} & \dots & p_{1,N}\\
+  p_{2,1} & p_{2,2} & \dots & p_{2,N}\\
+  & & \vdots & \\
+  p_{M,1} & p_{M,2} & \dots & p_{M,N}
+\end{pmatrix}
+\begin{pmatrix}
+  q_{1,1}&\dots & q_{1,p} \\
+  q_{2,1}&\dots & q_{2,p} \\
+   & \vdots & \\
+  q_{N,1}&\dots & q_{N,p}
+  \end{pmatrix}
+=
+\begin{pmatrix}
+  \sum_{i=1}^N p_{1,i} q_{i,1} & \dots & \sum_{i=1}^N p_{1,i} q_{i,p}\\
+ \vdots & \ddots & \vdots \\
+  \sum_{i=1}^N p_{M,i} q_{i,1} & \dots & \sum_{i=1}^N p_{M,i} q_{i,p}
+\end{pmatrix}
+$$
+
+So in our case we have:
+
+
+$$
+\mathbf{r} \approx
+\begin{pmatrix}
+  p_{1}\\
+  p_{2}\\
+  \vdots \\
+  p_{12}
+\end{pmatrix}
+\begin{pmatrix}
+  q_{1}&\dots & q_{5} 
+\end{pmatrix}
+=
+\begin{pmatrix}
+  p_{1} q_{1} & \dots & p_{1} q_{5}\\
+  \vdots& \ddots & \vdots\\
+  p_{12} q_{1} & \dots & p_{12} q_{5}
+\end{pmatrix}
+$$
+
+
+Here is a plot $r_{u,i}$ next to  $\mathbf{p} \mathbf{q}_$:
+
+```{r}
+P <- matrix(c(2, 2, 2, 0, 0, 0, 0, 0, -2, -2, -2, -2), ncol=1)
+Q <- matrix(c(1 , 1, 1, -1, -1), ncol=1)
+pq <- P%*%t(Q)
+image(pq)
+image(r)
+```
+
+
+We could explain more of the variability by fitting a model the accounts for this structure:
+
+$$
+Y_{u,i} = \mu + b_i + b_u + p_u q_i + \varepsilon_{u,i}
+$$
+
+In the example we gave here we suggested some specific values for the $p$s and $q$s but in practice we don't know what these are and have to estimate them from the data. In our example we also described these parameters as being categorical, but in practice we model them as continuous variable. So if we interpret $\mathbf{p}$ as representing the ganster to romance _dimension_ a movie can be in a spectrum.
+
+Also note that this is not a linear model since both the $p$s and $q$s are unknown parameters. This implies we can't estimate them with the `lm` function. But we can still find the values that minimize 
+the least sqaures. In the next section we learn about principal component analysis and how this can be used to estimate these values.
+
+The structure in our movie data seems to be much more complicated than gangster movie versus romance. We may need more factors to explain the variability. For example we may have:
 
 ```{r, echo=FALSE}
 set.seed(1)
@@ -569,34 +689,95 @@ Q <- cbind(c(1 , 1, 1, -1, -1, -1),
 rownames(Q) <- c("Godfather1","Godfather2","Goodfellas","Pretty Woman","Ghost","Scent of a Woman")
 P <- cbind(rep(c(2,0,-2), c(3,5,4)), 
           c(-1,1,1,0,0,1,1,1,0,-1,-1,-1))/2
-rownames(P) <- 1:nrow(X)
+rownames(P) <- 1:nrow(P)
 
-X = jitter(P%*%t(Q), factor=1)
-X %>% kable(align = "c")
+r <- jitter(P%*%t(Q), factor=1)
+r %>% kable(align = "c")
 ```
 
-Now we see another factor: love, hates, or doesn't care about Al Pacino. The correlation is a bit more complicated now.
+Here is an image of the residuals:
 
 ```{r}
-cor(X)
+image(r)
+```
+
+Now we see another factor that might be explained by: love, hates, or doesn't care about Al Pacino. The correlation is a bit more complicated now.
+
+```{r}
+cor(r)
 ```
 
 Now to explain the structure we need two factors:
 
-```{r}
+```{r, echo=FALSE}
 t(Q) %>% kable(aling="c")
 ```
 
 And two sets of coefficients:
 
-```{r}
+```{r, echo=FALSE}
 P
 ```
 
-The model now has more parameters but still less than the original data. So we should be able to fit this.
+To explain variability now we need a slighly more complicated formula:
 
 $$
-Y_{u,i} = \mu + b_i + b_u + p_{u,1} q_{1,i} + p_{u,2} q_{2,i} +\varepsilon_{i,j}
+r_{u,i} \approx p_{u,1} q_{i,1} + p_{u,2} q_{i,2} 
+$$
+
+Here is where matrix notation is helpful as we can write this approximation like this:
+
+$$
+\mathbf{r}  \approx
+\begin{pmatrix}
+  p_{1,1}&p_{1,2}\\
+  p_{2,1}&p_{1,2}\\
+  \vdots & \vdots\\
+  p_{12,1}&p_{12,2}
+\end{pmatrix}
+\begin{pmatrix}
+  q_{1,1}&\dots&q_{6,1}\\
+  q_{1,2}&\dots&q_{6,2}
+\end{pmatrix}
+=
+\begin{pmatrix}
+  p_{1,1} q_{1,1} + p_{1,2} q_{1,2} & \dots & p_{1,1} q_{6,1} +  p_{1,2} q_{6,2}\\
+  & \vdots & \\
+  p_{12,1} q_{1,1} + p_{12,2} q_{1,2} & \dots & p_{12,1} q_{6,1} + p_{12,2} q_{6,2}
+\end{pmatrix}
+$$
+
+
+Note that 
+$$
+\begin{pmatrix}
+  q_{1,1}&\dots&q_{6,1}\\
+  q_{1,2}&\dots&q_{6,2}
+\end{pmatrix}
+=
+\begin{pmatrix}
+  q_{1,1}&q_{6,2}\\
+  q_{2,1}&q_{6,2}\\
+  \vdots & \vdots\\
+  q_{6,1}&q_{6,2}
+\end{pmatrix}^\top
+$$
+
+We can form the approximation with
+
+```{r}
+Q <- cbind(c(1 , 1, 1, -1, -1, -1), 
+           c(1 , 1, -1, -1, -1, 1))
+P <- cbind(c(2,  2,  2,  0,  0,  0,  0,  0,  -2,  -2,  -2,  -2),
+          c(-1, 1, 1, 0, 0, 1, 1, 1, 0, -1, -1, -1))/2
+pq <- P %*% t(Q)
+image(pq)
+image(r)
+```
+
+The model now has more parameters, 34,  but still less than the original data 60.  
+$$
+Y_{u,i} = \mu + b_i + b_u + p_{u,1} q_{1,i} + p_{u,2} q_{2,i} + \varepsilon_{i,j}
 $$
 
 For the Netflix challenge, regularization was also used to penalize for large values of $p$ and $q$.
@@ -604,14 +785,23 @@ For the Netflix challenge, regularization was also used to penalize for large va
 Here are the actual correlations:
 
 ```{r}
-six_movies <- c("Godfather, The","Godfather: Part II, The","Goodfellas","Pretty Woman","Ghost", "Scent of a Woman")
+r <- train_small %>% 
+  select(userId, movieId, resids) %>%
+  spread(movieId, resids) %>% 
+  as.matrix()
+
+rownames(r) <- r[,1]
+r <- r[,-1]
+movie_titles <- movies$title[match(colnames(r), movies$movieId)]
+
+six_movies <- c("Godfather, The","Godfather: Part II, The","Goodfellas", "Pretty Woman","Ghost", "Scent of a Woman")
 ind <- match(six_movies, movie_titles)
-tmp <- Y[,ind]
+tmp <- r[,ind]
 colnames(tmp) <- six_movies
 cor(tmp, use="pairwise.complete")
 ```
 
-#### Connetion to PCA
+## Principal component Analysis
 
 The decomposition:
 
@@ -619,12 +809,12 @@ $$
 r_{u,i} \approx p_{u,1} q_{1,i} + p_{u,2} q_{2,i}
 $$
 
-is very much related to PCA. In we run PCA on the $r$ matrix, the first PC will be the vector $p_{1,1}, \dots p_{M,1}$ that minimizes the squared error of the approximation. 
+is very much related to a technique called Principal Component Analysis. If we run PCA on the $r$ matrix, the first PC will be the vector $p_{1,1}, \dots p_{M,1}$ that minimizes the squared error of the approximation. 
 So instead of estimating the praters for the model above, which is not straight-forward. We will use PCA to estimate these. It is not optimal but it will do. One weakness is that we have to fill-in the NAs. We will fill them in with 0s.
 
 ```{r}
-Y[is.na(Y)] <- 0
-pca <- prcomp(Y, center=FALSE, scale=FALSE) ## svd is faster here
+r[is.na(r)] <- 0
+pca <- prcomp(r - rowMeans(r), center=TRUE, scale=FALSE) ## svd is faster here
 
 library(ggrepel)
 
@@ -633,7 +823,7 @@ tmp <- data.frame(pca$rotation, name = movie_titles)
 tmp %>%  ggplot(aes(PC1, PC2)) + geom_point() + 
   geom_text_repel(aes(PC1, PC2, label=name),
                   data = filter(tmp, 
-                                PC1 < -0.1 | PC1 >0.1 | PC2 < -0.15 | PC2>0.0))
+                                PC1 < -0.1 | PC1 >0.1 | PC2 < -0.1 | PC2>0.1))
 ```
 
 ```{r}
@@ -649,10 +839,10 @@ To create an actual prediction we have to reconstruct the residuals using the fo
 ```{r}
 k <- 20
 pred <- pca$x[,1:k] %*% t(pca$rotation[,1:k])
-colnames(pred) <- colnames(Y)
+colnames(pred) <- colnames(r)
 
 interaction <- 
-    data.frame(userId = as.numeric(rownames(Y)), pred, check.names=FALSE) %>% 
+    data.frame(userId = as.numeric(rownames(r)), pred, check.names=FALSE) %>% 
     tbl_df %>%
     gather(movieId, b_ui, -userId) %>% 
     mutate(movieId = as.numeric(movieId))
