@@ -59,7 +59,7 @@ ratings %>%
   geom_bar(color="black")
 ```
 
-So we can think of these data as a very large matrix with users on the rows and movies on the columns. The `gather` function permits us to convert it to this format, but if we try it for the entire matrix it will crash R. Let's show the matrix for a few users:
+So we can think of these data as a very large matrix with users on the rows and movies on the columns. The `spread` function permits us to convert it to this format, but if we try it for the entire matrix it will crash R. Let's show the matrix for a few users:
 
 ```{r}
 url <- "https://raw.githubusercontent.com/datasciencelabs/data/master/movies.csv"
@@ -508,7 +508,7 @@ train_small <- train_small %>%
   mutate(resids = rating - mu - b_i - b_u)
 ```
 
-Next we create a matrix using `gather`:
+Next we create a matrix using `spread`:
 
 ```{r}
 r <- train_small %>% 
@@ -526,19 +526,19 @@ Some examples of movies that correlate:
 ```{r}
 i <- grep("Godfather, The", movie_titles)
 j <- grep("Goodf", movie_titles)
-qplot(Y[,i], Y[,j], xlab = movie_titles[i], ylab = movie_titles[j])
+qplot(r[,i], r[,j], xlab = movie_titles[i], ylab = movie_titles[j])
 ```
 
 ```{r}
 i <- grep("Pretty Woman", movie_titles)
 j <- which(movie_titles == "Ghost")
-qplot(Y[,i], Y[,j], xlab = movie_titles[i], ylab = movie_titles[j])
+qplot(r[,i], r[,j], xlab = movie_titles[i], ylab = movie_titles[j])
 ```
 
 ```{r}
 i <- grep("Godfather, The", movie_titles)
 j <- which(movie_titles == "Ghost")
-qplot(Y[,i], Y[,j], xlab = movie_titles[i], ylab = movie_titles[j])
+qplot(r[,i], r[,j], xlab = movie_titles[i], ylab = movie_titles[j])
 ```
 
 These figures tells us that there is structure in the data. It is certainly not just random. So we should be able to predict at least part of these residuals
@@ -550,7 +550,7 @@ If we fit a model with a parameter for each $u,i$ pair we will obviously overest
 ## Factors
 
 Here is an illustration of how we could use some structure to predict the $r_{u,i}$. 
-For this example we have 5 users and 12 movies. So our residual matrix is $12\times 5$:
+For this example we have 5 movies and 12 users. So our residual matrix is $12\times 5$:
 
 ```{r, echo=FALSE}
 set.seed(1)
@@ -657,7 +657,7 @@ $$
 $$
 
 
-Here is a plot $r_{u,i}$ next to  $\mathbf{p} \mathbf{q}_$:
+Here is a plot $r_{u,i}$ next to  $\mathbf{p} \mathbf{q}^\top$:
 
 ```{r}
 P <- matrix(c(2, 2, 2, 0, 0, 0, 0, 0, -2, -2, -2, -2), ncol=1)
@@ -679,7 +679,7 @@ In the example we gave here we suggested some specific values for the $p$s and $
 Also note that this is not a linear model since both the $p$s and $q$s are unknown parameters. This implies we can't estimate them with the `lm` function. But we can still find the values that minimize 
 the least sqaures. In the next section we learn about principal component analysis and how this can be used to estimate these values.
 
-The structure in our movie data seems to be much more complicated than gangster movie versus romance. We may need more factors to explain the variability. For example we may have:
+The structure in our movie data seems to be much more complicated than gangster movie versus romance. We may need more factors to explain the variability. For example suppose we have an additional movie in our example:
 
 ```{r, echo=FALSE}
 set.seed(1)
