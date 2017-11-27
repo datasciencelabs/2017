@@ -810,6 +810,86 @@ r_{u,i} \approx p_{u,1} q_{1,i} + p_{u,2} q_{2,i}
 $$
 
 is very much related to a technique called Principal Component Analysis. If we run PCA on the $r$ matrix, the first PC will be the vector $p_{1,1}, \dots p_{M,1}$ that minimizes the squared error of the approximation. 
+
+PCA is related to a matrix factorization technique called the _Singular Value Decomposition_ which is based on a result that tells us that any matrix $\mathbf{Y}$ can be factorized into two matrices
+
+$$
+\mathbf{Y} = \mathbf{P}\mathbf{Q}^\top
+$$
+
+with the columns of $\mathbf{P}$ and $\mathbf{Q}$ are uncorrleated and the 
+
+Let's demonstrate this with an example we saw before:
+
+```{r}
+set.seed(1)
+Q <- cbind(c(1 , 1, 1, -1, -1, -1), 
+           c(1 , 1, -1, -1, -1, 1))
+
+rownames(Q) <- c("Godfather1","Godfather2","Goodfellas","Pretty Woman","Ghost","Scent of a Woman")
+P <- cbind(rep(c(2,0,-2), c(5,5,8)), 
+          c(-1,-1,-1,1,1,0,0,1,1,1,0,0,0,0,0,-1,-1,-1))/2
+
+epsilon <-  matrix( rnorm(nrow(P)*nrow(Q)), nrow(P), nrow(Q))
+
+pq <- P %*%t (Q)
+
+Y <- pq + epsilon
+
+Y <- sweep(Y, 1, rowMeans(Y))
+Y <- sweep(Y, 2, colMeans(Y))
+```
+
+We see that there is structure in the matrix:
+```{r}
+cor(Y)
+```
+
+
+```{r}
+pca <- prcomp(Y)
+```
+
+The singular value decomposition gives us two matrices:
+
+```{r}
+dim(pca$x)
+dim(pca$rotation)
+```
+
+that factorize `Y` up to rounding error:
+```{r}
+Y_svd <- pca$x %*% t(pca$rotation)
+max(abs(Y - Y_svd))
+```
+
+To see why the factorization is useful we first note that because of how matrix multiplication works we can rewrite the above as:
+
+```{r}
+Y_svd <- 
+  pca$x[, 1, drop=FALSE] %*% t(pca$rotation[,1]) +
+  pca$x[, 2, drop=FALSE] %*% t(pca$rotation[,2]) +
+  pca$x[, 3, drop=FALSE] %*% t(pca$rotation[,3]) +
+  pca$x[, 4, drop=FALSE] %*% t(pca$rotation[,4]) +
+  pca$x[, 5, drop=FALSE] %*% t(pca$rotation[,5]) +
+  pca$x[, 6, drop=FALSE] %*% t(pca$rotation[,6])
+
+max(abs(Y - Y_svd))
+```
+
+and the correlation of these entries is 0
+```{r}
+cor(pca$x)
+cor(pca$rotation)
+```
+
+we can view this as breaking down the variation of $\mathbf{Y}$ into six parts. The variation of each part is determined by 
+
+```{r}
+vars <- apply(pca$x, 2, var)  
+qplot(1:6, vars / sum(vars) * 100, ylab = "% variability explained")
+```
+
 So instead of estimating the praters for the model above, which is not straight-forward. We will use PCA to estimate these. It is not optimal but it will do. One weakness is that we have to fill-in the NAs. We will fill them in with 0s.
 
 ```{r}
