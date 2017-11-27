@@ -1,5 +1,5 @@
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, results='hide', warning=FALSE}
 library(dplyr)
 library(ggplot2)
 theme_set(theme_bw(base_size = 16))
@@ -8,7 +8,7 @@ library(readr)
 
 # Decision Trees
 
-We have described two type machine learning algorithms. Linear approaches, including linear regression, generalized linear models (GLM), discriminant analysis, and smoothing approaches, including loess and k-nearest neighbors. The linear approaches were limiting in that partition of the prediction space had to be linear (in the case of QDA quadratic). A limitation of the smoothing approach is that with a large number of predictors,  we run into the problem of _the curse of dimensionality_.
+We have described two types of machine learning algorithms. Linear approaches, including linear regression, generalized linear models (GLM), discriminant analysis, and smoothing approaches, including loess and k-nearest neighbors. The linear approaches were limited in that the partition of the prediction space had to be linear (in the case of QDA quadratic). A limitation of the smoothing approach is that with a large number of predictors, we run into the problem of _the curse of dimensionality_.
 
 ## The Curse of Dimensionality
 
@@ -61,7 +61,7 @@ Here we look at a set of elegant and versatile methods that adapt to higher dime
 
 ### Regression Trees
 
-Consider the olives dataset below. We show two measured predictors, linoleic and eicosenoic. Suppose we wanted to predict the olive's region using these two predictors. What method would you use?
+Consider the olives dataset below. We show two measured predictors, linoleic and eicosenoic. Suppose we want to predict the olive's region using these two predictors. What method would you use?
 
 ```{r}
 olives <- read.csv("https://raw.githubusercontent.com/datasciencelabs/data/master/olive.csv", as.is=TRUE) %>% tbl_df
@@ -82,7 +82,7 @@ p <- p + geom_vline(xintercept = 6.5) +
 p
 ```
 
-The instructions for this prediction approach. The prediction algorithm inferred from the figure above is is what we call a decision tree. If eicosnoic is larger than 6.5 predict Southern Italy. If not, then if linoleic is larger than $1053.5$ predict Sardinia and Norther Italy otherwise. We can draw this decision tree like this:
+The instructions for this prediction approach. The prediction algorithm inferred from the figure above is what we call a decision tree. If eicosnoic is larger than 6.5 predict Southern Italy. If not, then if linoleic is larger than $1053.5$ predict Sardinia and Norther Italy otherwise. We can draw this decision tree like this:
 
 ```{r, echo=FALSE}
 library(rpart)
@@ -97,22 +97,22 @@ Decision trees like this are often used in practice. For example to decide if a 
 
 ![](http://nargund.com/gsu/mgs8040/resource/dss/Simple%20Heuristics%20That%20Make%20Us%20Smart_files/todd.fig1.gif)
 
-The general idea of the methods we are describing is to define an algorithm that uses data to create these tress. 
+The general idea of the methods we are describing is to define an algorithm that uses data to create these trees. 
 
 Regression and decision trees operate by predicting an outcome variable $Y$ by partitioning feature (predictor) space.
 
 ## Regression Trees
 
-Let's start with case of a continuous outcome. The general idea here is to build a decision tree and at end of each _node_ we will have a different prediction $\hat{Y}$ for the outcome $Y$..
+Let's start with case of a continuous outcome. The general idea here is to build a decision tree and at the end of each _node_ we will have a different prediction $\hat{Y}$ for the outcome $Y$.
 
 The regression tree model then:
 
 1. Partitions space into $J$ non-overlapping regions, $R_1, R_2, \ldots, R_J$.
 2. For every observation that falls within region $R_j$, predict response as mean of response for training observations in $R_j$.
 
-The important observation is that **Regression Trees create partition recursively**
+The important observation is that **Regression Trees create partitions recursively**
 
-For example, consider finding a good predictor $j$ to partition space its axis. A recursive algorithm would look like this:
+For example, consider finding a good predictor $j$ to partition its axis. A recursive algorithm would look like this:
 
 1. Find predictor $j$ and value $s$ that minimize RSS:
 
@@ -176,14 +176,14 @@ polls_2008 %>% mutate(f_hat = pred) %>% ggplot() +
   geom_step(aes(X, f_hat), col="blue")
 ```
 
-The decision trees partitions the `weight` predictor into regions based on its value. We can show this graphically as below. The idea behind the regression tree is that outcome $Y$  is estimated (or predicted) to be it's mean _within each of the data partitions_. Think of it as the conditional mean of $Y$ where conditioning is given by this region partitioning.
+The decision tree partitions the `weight` predictor into regions based on its value. We can show this graphically as below. The idea behind the regression tree is that outcome $Y$ is estimated (or predicted) to be it's mean _within each of the data partitions_. Think of it as the conditional mean of $Y$ where conditioning is given by this region partitioning.
 
 
 ### Specifics of the regression tree algorithm
 
 The recursive partitioning algorithm described above leads to a set of natural questions:
 
-_When do we stop partitioning?_ We stop when adding a partition does not reduce RSS, or, when partition has too few training observations. Even then, trees built with this stopping criterion tend to _overfit_ training data. To avoid this, a post-processing step called _pruning_ is used to make the tree smaller.
+_When do we stop partitioning?_ We stop when adding a partition does not reduce RSS, or when partition has too few training observations. Even then, trees built with this stopping criterion tend to _overfit_ training data. To avoid this, a post-processing step called _pruning_ is used to make the tree smaller.
 
 **Question:** why would a smaller tree tend to generalize better?
 
@@ -282,7 +282,7 @@ library(gridExtra)
 grid.arrange(true_f_plot, p, nrow=1)
 ```
 
-To prune the tree we can use the `prune.tree` function. In this case the pruned tree does not differ much fro the original.
+To prune the tree we can use the `prune.tree` function. In this case the pruned tree does not differ much from the original.
 
 ```{r}
 pruned_fit <- prune.tree(fit)
@@ -305,9 +305,8 @@ p
 ```
 
 
-
 Classification trees have certain advantages that make them very useful. They are
-highly interpretable, even more so than linear models. Are easy to visualize (if small enough), they (maybe) model human decision processes and don't require that dummy predictors for categorical variables are used.
+highly interpretable, even more so than linear models. They are easy to visualize (if small enough), they (maybe) model human decision processes and don't require that dummy predictors for categorical variables are used.
 
 On the other hand, the greedy approach via recursive partitioning is a bit harder to train than linear regression. It may not always be the best performing method since it is not very flexible and are highly unstable to changes in training data.
 
@@ -342,7 +341,7 @@ M <- median(X)
 M
 ```
 
-Can we construct a confidence interval? What is the distribution of $M$ ?
+Can we construct a confidence interval? What is the distribution of $M$?
 
 From a Monte Carlo simulation we see that the distribution of $M$ is approximately normal with the following expected value and standard error:
 
@@ -402,7 +401,7 @@ mean(M_stars) + 1.96*sd(M_stars)*c(-1,1)
 
 
 
-## Random Forrests
+## Random Forests
 
 Random Forests are a **very popular** approach that address the shortcomings of decision trees via re-sampling of the training data. Their goal is to improve prediction performance and reduce instability by _averaging_ multiple decision trees (a forest constructed with randomness). It has to features that help accomplish this.
 
@@ -556,8 +555,6 @@ get_accuracy(fit)
 
 
 
-
-
 A disadvantage of random forests is that we lose interpretability. However, we can use the fact that a bootstrap sample was used to construct trees to measure _variable importance_ from the random forest.
 
 Let's see this using all the digits data
@@ -620,7 +617,7 @@ tmp %>% filter(Gini > 200) %>%
 
 ### Tree-based methods summary
 
-Tree-based methods are very interpretable _prediction_ models. For which some inferential tasks are possible (e.g., variable importance in random forests), but are much more limited than the linear models we saw previously. These methods are very commonly used across many application domains and Random Forests often perform at state-of-the-art for many tasks.
+Tree-based methods are very interpretable _prediction_ models. Some inferential tasks are possible for these methods (e.g., variable importance in random forests), but are much more limited than the linear models we saw previously. Tree-based methods are very commonly used across many application domains and Random Forests often perform at state-of-the-art for many tasks.
 
 
 
