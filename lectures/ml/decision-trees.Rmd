@@ -1,9 +1,10 @@
 
-```{r, echo=FALSE, results='hide', warning=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library(dplyr)
 library(ggplot2)
-theme_set(theme_bw(base_size = 16))
 library(readr)
+library(dslabs)
+ds_theme_set()
 ```
 
 # Decision Trees
@@ -14,12 +15,12 @@ We have described two types of machine learning algorithms. Linear approaches, i
 
 A useful way of understand the curse of dimensionality is by considering how large we have to make a neighborhood/window to include a given percentage of the data. For example, suppose we have one continuous predictor with equally spaced points in the [0,1] interval and we want create windows that include 1/10-th of data. Then it's easy to see that our windows have to be of size 0.1:
 
-```{r, fig.width=10, fig.height=1}
+```{r, fig.width=10, fig.height=1, echo=FALSE}
 rafalib::mypar()
 x <- seq(0,1,len=100)
 y <- rep(1, 100)
 plot(x,y, xlab="",ylab="", cex=0.25, yaxt="n", xaxt="n",type="n")
-lines(x[c(15,35)], y[c(15,35)], col="blue",lwd=3)
+lines(x[c(15,35)], y[c(15,35)], col="lightblue",lwd=3)
 points(x,y, cex = 0.25)
 points(x[25],y[25],col="blue", cex = 0.5, pch=4)
 text(x[c(15,35)], y[c(15,35)], c("[","]"))
@@ -33,7 +34,7 @@ x <- tmp[,1]
 y <- tmp[,2]
 plot(x,y, xlab="",ylab="", cex=0.25, yaxt="n", xaxt="n",type="n")
 polygon(c(x[25]-0.5, x[25]-0.5, x[25]+0.5, x[25]+0.5),
-        c(y[25]-0.5, y[25]+0.5, y[25]+0.5, y[25]-0.5), col="blue")
+        c(y[25]-0.5, y[25]+0.5, y[25]+0.5, y[25]-0.5), col="lightblue")
 points(x,y, cex = 0.25)
 points(x[25],y[25], cex = 0.5, pch=4)
 ```
@@ -44,12 +45,12 @@ or, if we want to include 10% of the data we need to increase the window size to
 plot(x,y, xlab="",ylab="", cex=0.25, yaxt="n", xaxt="n",type="n")
 polygon(c(x[25]-sqrt(10)/2, x[25]-sqrt(10)/2, x[25]+sqrt(10)/2, x[25]+sqrt(10)/2),
         c(y[25]-sqrt(10)/2, y[25]+sqrt(10)/2, y[25]+sqrt(10)/2, y[25]-sqrt(10)/2),
-        col="blue")
+        col="lightblue")
 points(x,y, cex = 0.25)
 points(x[25],y[25], cex = 0.5, pch=4)
 ```
 
-To include 10% of the data in a case with $p$ features we need an interval for each interval that covers $.10^{1/p}$ of the total. This proportion gets close to 1 (including all the data and no longer smoothing) quickly:
+To include 10% of the data in a case with $p$ features we need an interval for each interval that covers $0.10^{1/p}$ of the total. This proportion gets close to 1 quickly:
 
 ```{r, echo=FALSE}
 p <- 1:100
@@ -57,18 +58,16 @@ plot(p, .1^(1/p),ylim=c(0,1))
 abline(h=1)
 ```
 
-Here we look at a set of elegant and versatile methods that adapt to higher dimensions and also allow these regions to take more complex shapes, but still produce models that are interpretable. These are very popular, well-known and studied methods. We will concentrate on Regression and Decision Trees and their extension to Random Forests.
+When the proportion is 1, it means we need to include all the data and no longer smoothing and are estimating with a constant.
 
-### Regression Trees
+Here we look at a set of elegant and versatile methods that adapt to higher dimensions and also allow these regions to take more complex shapes, but still produce models that are interpretable. While there are several methods  We will focus on Regression and Decision Trees (CART) and how these are used to develop a more powerful method: Random Forests.
+
+## Regression Trees
 
 Consider the olives dataset below. We show two measured predictors, linoleic and eicosenoic. Suppose we want to predict the olive's region using these two predictors. What method would you use?
 
 ```{r}
-olives <- read.csv("https://raw.githubusercontent.com/datasciencelabs/data/master/olive.csv", as.is=TRUE) %>% tbl_df
-names(olives)[1] <- "province"
-region_names <- c("Southern Italy","   Sardinia","Northern Italy")
-olives <- olives %>% mutate(Region=factor(region_names[Region]))
-
+olives <- read_csv("http://www.public.iastate.edu/~dicook/stat407/data/olive.csv") 
 p <- olives %>% ggplot(aes(eicosenoic, linoleic, fill=Region)) +
   geom_point(pch=21)
 p
@@ -84,37 +83,44 @@ p
 
 The instructions for this prediction approach. The prediction algorithm inferred from the figure above is what we call a decision tree. If eicosnoic is larger than 6.5 predict Southern Italy. If not, then if linoleic is larger than $1053.5$ predict Sardinia and Norther Italy otherwise. We can draw this decision tree like this:
 
-```{r, echo=FALSE}
-library(rpart)
 
-fit <- rpart(as.factor(Region)~., 
-             data = select(olives, -province, -Area))
+
+```{r}
+library(tree)
+fit <- olives %>%
+  select(-Area) %>%
+  mutate(Region = factor(Region)) %>%
+  tree(Region ~ ., data = .)
+
 plot(fit)
-text(fit, cex = 0.5)
+text(fit)
 ```
 
 Decision trees like this are often used in practice. For example to decide if a person is at risk of having  heart attack doctors use the following:
 
-![](http://nargund.com/gsu/mgs8040/resource/dss/Simple%20Heuristics%20That%20Make%20Us%20Smart_files/todd.fig1.gif)
+```{r, echo=FALSE}
+knitr::include_graphics("http://nargund.com/gsu/mgs8040/resource/dss/Simple%20Heuristics%20That%20Make%20Us%20Smart_files/todd.fig1.gif")
+```
 
-The general idea of the methods we are describing is to define an algorithm that uses data to create these trees. 
+The general idea of these  is to define an algorithm that uses data to create these trees. 
 
-Regression and decision trees operate by predicting an outcome variable $Y$ by partitioning feature (predictor) space.
+Regression and decision trees operate by predicting an outcome variable $Y$ by partitioning the feature (predictor) space.
 
 ## Regression Trees
 
-Let's start with case of a continuous outcome. The general idea here is to build a decision tree and at the end of each _node_ we will have a different prediction $\hat{Y}$ for the outcome $Y$.
+Let's start with case of a continuous outcome. The general idea here is to build a decision tree and at the end of each _node_, the parts of the tree that no longer split,  we will have a different prediction $\hat{Y}$ for the outcome $Y$.
 
 The regression tree model then:
 
 1. Partitions space into $J$ non-overlapping regions, $R_1, R_2, \ldots, R_J$.
-2. For every observation that falls within region $R_j$, predict response as mean of response for training observations in $R_j$.
+2. For every observation that falls within region $R_j$, predict the response as the average of the  training observations in $R_j$.
 
+Training the algorithm involves defining. the non-overlapping regions. 
 The important observation is that **Regression Trees create partitions recursively**
 
 For example, consider finding a good predictor $j$ to partition its axis. A recursive algorithm would look like this:
 
-1. Find predictor $j$ and value $s$ that minimize RSS:
+1. Find the predictor $j$ and value $s$ that minimize RSS:
 
 $$
 \sum_{i:\, x_i \in R_1(j,s))} (y_i - \hat{y}_{R_1})^2 +
@@ -124,7 +130,7 @@ $$
 Where $R_1$ and $R_2$ are regions resulting from splitting observations on predictor $j$ and value $s$:
 
 $$
-R_1(j,s) = \{X|X_j < s\} \mathrm{ and } R_2(j,s) \{X|X_j \geq s\}
+R_1(j,s) = \{X|X_j < s\} \mbox{ and } R_2(j,s) = \{X|X_j \geq s\}
 $$
 
 This is then applied recursively to regions $R_1$ and $R_2$. Within each region a prediction is made using $\hat{y}_{R_j}$ which is the mean of the response $Y$ of observations in $R_j$.
@@ -158,60 +164,101 @@ polls_2008 <-  filter(polls_2008, start_date>="2008-06-01") %>%
 polls_2008 %>% ggplot(aes(X, Y)) + geom_point() 
 ```
 
+We saved the data above to the object `polls_2008` with columns `X` and `Y`.
+
 Regression trees are built in R using a similar interface as linear models:
 
 ```{r, fig.height=14, fig.height=7}
 library(tree)
-fit <- tree(Y~X, data = polls_2008)
-pred <- predict(fit)
-plot(fit)
-text(fit, cex = 0.5)
+fit <- tree(Y ~ X, data = polls_2008)
 ```
 
 With only one feature we can actually plot the prediction:
 
 ```{r, fig.height=10, fig.height=7}
+pred <- predict(fit)
 polls_2008 %>% mutate(f_hat = pred) %>% ggplot() +
   geom_point(aes(X, Y)) +
   geom_step(aes(X, f_hat), col="blue")
 ```
 
-The decision tree partitions the `weight` predictor into regions based on its value. We can show this graphically as below. The idea behind the regression tree is that outcome $Y$ is estimated (or predicted) to be it's mean _within each of the data partitions_. Think of it as the conditional mean of $Y$ where conditioning is given by this region partitioning.
+DIFFERENT PARAMETERS
 
+```{r, fig.height=14, fig.height=7}
+library(tree)
+fit <- tree(Y ~ X, data = polls_2008, 
+            control = tree.control(nobs=nrow(polls_2008), 
+                                   mincut = 1,
+                                   minsize = 2, 
+                                   mindev = 0.01))
+pred <- predict(fit)
+polls_2008 %>% mutate(f_hat = pred) %>% ggplot() +
+  geom_point(aes(X, Y)) +
+  geom_step(aes(X, f_hat), col="blue")
+```
+
+
+The decision tree partitions the `X` predictor into regions based on its value. We can show this graphically as below. The idea behind the regression tree is that the outcome $Y$ is estimated (or predicted) to be it's mean _within each of the data partitions_. Think of it as the conditional mean of $Y$ where conditioning is given by this region partitioning.
+
+
+```{r}
+plot(fit)
+text(fit, cex = 0.5)
+```
 
 ### Specifics of the regression tree algorithm
 
 The recursive partitioning algorithm described above leads to a set of natural questions:
 
-_When do we stop partitioning?_ We stop when adding a partition does not reduce RSS, or when partition has too few training observations. Even then, trees built with this stopping criterion tend to _overfit_ training data. To avoid this, a post-processing step called _pruning_ is used to make the tree smaller.
+**When do we stop partitioning?** We stop when adding a partition does not reduce RSS, or when partition has too few training observations. You can see the default numbers in the _control function_ that is passed through the `control` argument in`tree`:
 
-**Question:** why would a smaller tree tend to generalize better?
+```{r}
+args(tree.control)
+```
 
+Even when controlling the number of nodes, trees built with this stopping criterion tend to _overfit_ training data. Remember the RSS To avoid this, a post-processing step called _pruning_ is used to make the tree smaller. The idea is to use cross validation to determine  if removing some branches provides better predictions on a test set.
 
 The `cv.tree` function is used to determine a reasonable tree depth for the given dataset. For this dataset it seems that a depth of 7 works well:
 
 ```{r, echo=TRUE}
-fit <- tree(Y~X, data = polls_2008,
-            control = tree.control(nobs = nrow(polls_2008), 
-                                   mincut = 1, minsize = 2, mindev = 0.001))
+fit <- tree(Y~X, data = polls_2008)#,
+            #control = tree.control(nobs = nrow(polls_2008), 
+             #                      mincut = 0, minsize = 1, mindev = 0.0001))
 
 cv_polls <- cv.tree(fit)
 data_frame(tree_size = cv_polls$size, RSS = cv_polls$dev) %>% 
-  filter(tree_size>1 & tree_size < 20) %>%
-  ggplot(aes(tree_size, RSS)) + geom_point()
+  filter(tree_size>2 & tree_size < 40) %>%
+  ggplot(aes(tree_size, RSS)) + 
+  geom_point() +
+  geom_line()
 ```
 
 Here we see how deep trees can overfit this dataset and perform poorly on new, unseen data. Here is the tree we think will do a good job on prediction based on the plot above.
+
+```{r}
+pred <- predict(fit)
+final_fit <- prune.tree(fit, best = 8)
+final_pred <- predict(final_fit)
+polls_2008 %>% mutate(f_hat = pred, f_hat_final = final_pred) %>% ggplot() +
+  geom_point(aes(X, Y)) +
+  geom_step(aes(X, f_hat), col="red") +
+  geom_step(aes(X, f_hat_final), col="blue")
+```
 
 
 ### Classification (Decision) Trees
 
 Classification, or decision trees, are used in classification problems, where the outcome is categorical. The same partitioning principle, but now, each region predicts the majority class for training observations within region. The recursive partitioning algorithm we saw previously requires a score function to choose predictors (and values) to partition with. In classification we could use a naive approach of looking for partitions that minimize training error. However, better performing approaches use more sophisticated metrics. Here are two of the most popular (denoted for leaf $m$):
  
-  - **Gini Index**: $\sum_{k=1}^K \hat{p}_{mk}(1-\hat{p}_{mk})$, or
-  - **Entropy**: $-\sum_{k=1}^K \hat{p}_{mk}\log(\hat{p}_{mk})$
+**Gini Index** 
+$$\sum_{k=1}^K \hat{p}_{m,k}(1-\hat{p}_{m,k})$$ 
+and
+
+**Entropy**: 
+
+$$-\sum_{k=1}^K \hat{p}_{m,k}\log(\hat{p}_{m,k})$$
   
-where $\hat{p}_{mk}$ is the proportion of training observations in partition $m$ labeled as class $k$. Both of these seek to partition observations into subsets that have the same labels.
+where $\hat{p}_{m,k}$ is the proportion of training observations in partition $m$ labeled as class $k$. Both of these seek to partition observations into subsets that have the same labels.
 
 Let us look at how a classification tree performs on the digits example we examined before:
 
@@ -403,7 +450,7 @@ mean(M_stars) + 1.96*sd(M_stars)*c(-1,1)
 
 ## Random Forests
 
-Random Forests are a **very popular** approach that address the shortcomings of decision trees via re-sampling of the training data. Their goal is to improve prediction performance and reduce instability by _averaging_ multiple decision trees (a forest constructed with randomness). It has to features that help accomplish this.
+Random Forests are a popular approach that address the shortcomings of decision trees via re-sampling of the training data. Their goal is to improve prediction performance and reduce instability by _averaging_ multiple decision trees (a forest constructed with randomness). It has to features that help accomplish this.
 
 The first trick is *Bagging* (bootstrap aggregation)
 General scheme:
@@ -559,7 +606,7 @@ A disadvantage of random forests is that we lose interpretability. However, we c
 
 Let's see this using all the digits data
 
-```{r}
+```{r, cache=TRUE}
 library(readr)
 library(dplyr)
 url <- "https://raw.githubusercontent.com/datasciencelabs/data/master/hand-written-digits-train.csv"
