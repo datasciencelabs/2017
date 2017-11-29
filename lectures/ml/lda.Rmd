@@ -297,7 +297,18 @@ plot(roc_qda)
 plot(roc_knn_51, add=TRUE, col=4)
 ```
 
+To summarize these curves into one single number that can be compared across methods, it is common to take the area under the ROC curve (abbreviated AUC). Higher values indicate better performance.
+
+```{r}
+auc(roc_qda)
+auc(roc_lda)
+auc(roc_knn_5)
+auc(roc_knn_51)
+```
+
 ## Three classes
+
+Here we look at an example where there are three classes to consider. In addition to 2s and 7s, we also consider 1s. Now we need to estimate three different curves that represent the conditional probabilities of being each digit given the values of $X_1$ and $X_2$.
 
 ```{r, echo=FALSE, cache=TRUE}
 ##Get the truth
@@ -350,6 +361,8 @@ library(gridExtra)
 grid.arrange(p1,p2,p3, nrow=1)
 ```
 
+We'll create a training set so we can test out how each method does on the three class problem.
+
 ```{r}
 ##create the training set
 set.seed(1)
@@ -366,7 +379,7 @@ train_set %>% ggplot(aes(X_1,X_2,fill=label)) + geom_point(cex=5, pch=21)
 ```
 
 
-#### LDA
+#### LDA on three classes
 
 ```{r}
 params <- train_set %>% group_by(label) %>% 
@@ -391,7 +404,7 @@ tmp %>% ggplot() +
   geom_point(aes(X_1,X_2,fill=label), dat=test_set,pch=21)
 ```
 
-#### QDA
+#### QDA on three classes
 
 ```{r}
 params <- train_set %>% group_by(label) %>% 
@@ -416,7 +429,7 @@ tmp %>% ggplot() +
 ```
 
 
-#### GLM
+#### GLM on three classes
 ```{r}
 library(caret)
 
@@ -440,7 +453,7 @@ tmp %>% ggplot() +
 ```
 
 
-#### kNN
+#### kNN on three classes
 ```{r}
 library(caret)
 
