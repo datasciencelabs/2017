@@ -62,7 +62,7 @@ X2 <- rowSums(X[,ind2])/rowSums(X)
 dat <- mutate(dat, X_1 = X1, X_2 = X2)
 ```
 
-We can see some example of what these predictors are:
+We can see some examples of what these predictors are:
 
 ```{r, echo=FALSE, fig.align="center", fig.width=14}
 tmp <- lapply( c(37,9,5,28), function(i){
@@ -186,9 +186,9 @@ grid.arrange(true_f_plot, p, nrow=1)
 
 Here we have 2 predictors and had to compute 4 means, 4 SDs and 2 correlations. How many parameters would we have if instead of 2 predictors we had 10? 
 
-The main problems comes from estimating correlations for 10 of predictors. With 10, we have 45 correlations for each class. In general the formula is $p(p-1)/2$ which gets big fast. 
+The main problems comes from estimating correlations for 10 predictors. With 10, we have 45 correlations for each class. In general the formula is $p(p-1)/2$ which gets big quickly. 
 
-A relatively solution to this is to assume that the correlation structure is the same for all classes. Which reduces the number of parameters we need to estimate. When we do this, we can show mathematical that the solution is "linear", in the linear algebra sense and we call it Linear Discriminant Analysis (LDA). 
+A solution to this is to assume that the correlation structure is the same for all classes. This reduces the number of parameters we need to estimate. When we do this, we can show mathematically that the solution is "linear", in the linear algebra sense and we call it Linear Discriminant Analysis (LDA). 
 
 ```{r}
 params <- train_set %>% group_by(y) %>% 
@@ -232,13 +232,13 @@ $$
 - \frac{(x-\mu)^2}{\sigma^2}
 $$
 
-which is the negative of a distance squared scaled by the standard deviation. For higher dimensions the same is true expect the scaling is more complex and involved correlations.
+which is the negative of a distance squared scaled by the standard deviation. For higher dimensions the same is true expect the scaling is more complex and involves correlations.
 
 ## ROC
 
-With the example we have been examining we can make two types of errors: calling a 2 a 7 or calling a 7 a 2. More generally, we binary data we call these false positives (calling a 0 a 1) and false negatives (calling a 1 a 0). Here we have arbitrarily made 7s 1s and 2s 0s.  
+With the example we have been examining we can make two types of errors: calling a 2 a 7 or calling a 7 a 2. More generally, with binary data we call these false positives (calling a 0 a 1) and false negatives (calling a 1 a 0). Here we have arbitrarily made 7s 1s and 2s 0s.  
 
-This concept is important in many areas and in particular in health where one type of mistake can be much more costly than another. Note that we have been predicting 1s based on the rule $\hat{f}(x_1, x_2) > 0.5$ but we pick another cutoff, depending on how the cost of errors. For example, if we are predicting if a plane will malfunction, then we want a very low false negative rate and are willing to sacrifice our true positive rate. 
+This concept is important in many areas and in particular in health where one type of mistake can be much more costly than another. Note that we have been predicting 1s based on the rule $\hat{f}(x_1, x_2) > 0.5$ but we can pick another cutoff, depending on the cost of each type of error. For example, if we are predicting if a plane will malfunction, then we want a very low false negative rate and are willing to sacrifice our true positive rate. 
 
 We can see that the estimated probabilities are in a continuum:
 
@@ -281,7 +281,7 @@ plot(roc_qda)
 plot(roc_lda, add=TRUE, col=2)
 ```
 
-We can also compare to kin
+We can also compare to KNN with two different values of `k`
 
 ```{r}
 fit <- knn3(y~., data = train_set, k=5)
@@ -326,7 +326,7 @@ f1 <- loess(yhat[,1]~X_1*X_2, data=true_f,degree=1, span=1/5)$fitted
 f2 <- loess(yhat[,2]~X_1*X_2, data=true_f,degree=1, span=1/5)$fitted
 f7 <- loess(yhat[,3]~X_1*X_2, data=true_f,degree=1, span=1/5)$fitted
 true_f <- true_f %>% mutate(f1=pmin(f1,1), f2=f2, f7=f7) 
-rm(dat27,X,X1,X2,fit,GS,X1s,X2s,yhat,f1, f2, f7)
+rm(X,X1,X2,fit,GS,X1s,X2s,yhat,f1, f2, f7)
 
 p1 <- true_f %>%
   ggplot(aes(X_1, X_2, fill=f1))  +
